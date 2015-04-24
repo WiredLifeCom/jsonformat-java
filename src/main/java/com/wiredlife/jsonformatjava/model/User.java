@@ -53,6 +53,52 @@ public class User {
 	}
 
 	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((this.inventory == null) ? 0 : this.inventory.hashCode());
+		result = prime * result + ((this.username == null) ? 0 : this.username.hashCode());
+		result = prime * result + ((this.zones == null) ? 0 : this.zones.hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj) {
+			return true;
+		}
+		if (obj == null) {
+			return false;
+		}
+		if (!(obj instanceof User)) {
+			return false;
+		}
+		User other = (User) obj;
+		if (this.inventory == null) {
+			if (other.inventory != null) {
+				return false;
+			}
+		} else if (!this.inventory.equals(other.inventory)) {
+			return false;
+		}
+		if (this.username == null) {
+			if (other.username != null) {
+				return false;
+			}
+		} else if (!this.username.equals(other.username)) {
+			return false;
+		}
+		if (this.zones == null) {
+			if (other.zones != null) {
+				return false;
+			}
+		} else if (!this.zones.equals(other.zones)) {
+			return false;
+		}
+		return true;
+	}
+
+	@Override
 	public String toString() {
 		StringBuilder builder = new StringBuilder();
 		builder.append("User [username=");

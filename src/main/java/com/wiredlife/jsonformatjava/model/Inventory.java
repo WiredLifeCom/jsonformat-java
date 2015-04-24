@@ -52,6 +52,44 @@ public class Inventory {
 	}
 
 	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((this.items == null) ? 0 : this.items.hashCode());
+		result = prime * result + ((this.resources == null) ? 0 : this.resources.hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj) {
+			return true;
+		}
+		if (obj == null) {
+			return false;
+		}
+		if (!(obj instanceof Inventory)) {
+			return false;
+		}
+		Inventory other = (Inventory) obj;
+		if (this.items == null) {
+			if (other.items != null) {
+				return false;
+			}
+		} else if (!this.items.equals(other.items)) {
+			return false;
+		}
+		if (this.resources == null) {
+			if (other.resources != null) {
+				return false;
+			}
+		} else if (!this.resources.equals(other.resources)) {
+			return false;
+		}
+		return true;
+	}
+
+	@Override
 	public String toString() {
 		StringBuilder builder = new StringBuilder();
 		builder.append("Inventory [resources=");

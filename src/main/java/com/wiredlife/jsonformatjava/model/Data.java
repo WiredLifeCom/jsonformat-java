@@ -38,6 +38,44 @@ public class Data {
 	}
 
 	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((this.unload == null) ? 0 : this.unload.hashCode());
+		result = prime * result + ((this.user == null) ? 0 : this.user.hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj) {
+			return true;
+		}
+		if (obj == null) {
+			return false;
+		}
+		if (!(obj instanceof Data)) {
+			return false;
+		}
+		Data other = (Data) obj;
+		if (this.unload == null) {
+			if (other.unload != null) {
+				return false;
+			}
+		} else if (!this.unload.equals(other.unload)) {
+			return false;
+		}
+		if (this.user == null) {
+			if (other.user != null) {
+				return false;
+			}
+		} else if (!this.user.equals(other.user)) {
+			return false;
+		}
+		return true;
+	}
+
+	@Override
 	public String toString() {
 		StringBuilder builder = new StringBuilder();
 		builder.append("Data [user=");

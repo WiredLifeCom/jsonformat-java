@@ -55,6 +55,55 @@ public class Zone {
 	}
 
 	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((this.arrival == null) ? 0 : this.arrival.hashCode());
+		result = prime * result + ((this.departure == null) ? 0 : this.departure.hashCode());
+		long temp;
+		temp = Double.doubleToLongBits(this.latitude);
+		result = prime * result + (int) (temp ^ (temp >>> 32));
+		temp = Double.doubleToLongBits(this.longitude);
+		result = prime * result + (int) (temp ^ (temp >>> 32));
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj) {
+			return true;
+		}
+		if (obj == null) {
+			return false;
+		}
+		if (!(obj instanceof Zone)) {
+			return false;
+		}
+		Zone other = (Zone) obj;
+		if (this.arrival == null) {
+			if (other.arrival != null) {
+				return false;
+			}
+		} else if (!this.arrival.equals(other.arrival)) {
+			return false;
+		}
+		if (this.departure == null) {
+			if (other.departure != null) {
+				return false;
+			}
+		} else if (!this.departure.equals(other.departure)) {
+			return false;
+		}
+		if (Double.doubleToLongBits(this.latitude) != Double.doubleToLongBits(other.latitude)) {
+			return false;
+		}
+		if (Double.doubleToLongBits(this.longitude) != Double.doubleToLongBits(other.longitude)) {
+			return false;
+		}
+		return true;
+	}
+
+	@Override
 	public String toString() {
 		StringBuilder builder = new StringBuilder();
 		builder.append("Zone [arrival=");
