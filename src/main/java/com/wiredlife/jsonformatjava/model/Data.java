@@ -1,11 +1,15 @@
 package com.wiredlife.jsonformatjava.model;
 
+import org.joda.time.DateTime;
+
+import com.fatboyindustrial.gsonjodatime.Converters;
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 
 public class Data {
 
 	private User user;
-	private String unload;
+	private DateTime unload;
 
 	public User getUser() {
 		return this.user;
@@ -15,11 +19,11 @@ public class Data {
 		this.user = user;
 	}
 
-	public String getUnload() {
+	public DateTime getUnload() {
 		return this.unload;
 	}
 
-	public void setUnload(String unload) {
+	public void setUnload(DateTime unload) {
 		this.unload = unload;
 	}
 
@@ -35,12 +39,12 @@ public class Data {
 	}
 
 	public static String toJson(Data data) {
-		Gson gson = new Gson();
+		Gson gson = Converters.registerDateTime(new GsonBuilder()).create();
 		return gson.toJson(data);
 	}
 
 	public static Data fromJson(String json) {
-		Gson gson = new Gson();
+		Gson gson = Converters.registerDateTime(new GsonBuilder()).create();
 		return gson.fromJson(json, Data.class);
 	}
 

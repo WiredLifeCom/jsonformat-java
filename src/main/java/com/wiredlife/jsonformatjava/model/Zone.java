@@ -1,26 +1,28 @@
 package com.wiredlife.jsonformatjava.model;
 
+import org.joda.time.DateTime;
+
 public class Zone {
 
-	private String arrival;
-	private String departure;
+	private DateTime arrival;
+	private DateTime departure;
 
 	private double latitude;
 	private double longitude;
 
-	public String getArrival() {
+	public DateTime getArrival() {
 		return this.arrival;
 	}
 
-	public void setArrival(String arrival) {
+	public void setArrival(DateTime arrival) {
 		this.arrival = arrival;
 	}
 
-	public String getDeparture() {
+	public DateTime getDeparture() {
 		return this.departure;
 	}
 
-	public void setDeparture(String departure) {
+	public void setDeparture(DateTime departure) {
 		this.departure = departure;
 	}
 
