@@ -13,6 +13,12 @@ public class Inventory {
 		this.items = new ArrayList<String>();
 	}
 
+	public Inventory(List<String> resources, List<String> items) {
+		this();
+		this.resources = resources;
+		this.items = items;
+	}
+
 	public void addResource(String resource) {
 		this.resources.add(resource);
 	}

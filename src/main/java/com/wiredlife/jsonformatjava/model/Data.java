@@ -11,6 +11,16 @@ public class Data {
 	private User user;
 	private DateTime unload;
 
+	public Data() {
+
+	}
+
+	public Data(User user, DateTime unload) {
+		this();
+		this.user = user;
+		this.unload = unload;
+	}
+
 	public User getUser() {
 		return this.user;
 	}

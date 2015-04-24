@@ -10,6 +10,18 @@ public class Zone {
 	private double latitude;
 	private double longitude;
 
+	public Zone() {
+
+	}
+
+	public Zone(DateTime arrival, DateTime departure, double latitude, double longitude) {
+		this();
+		this.arrival = arrival;
+		this.departure = departure;
+		this.latitude = latitude;
+		this.longitude = longitude;
+	}
+
 	public DateTime getArrival() {
 		return this.arrival;
 	}

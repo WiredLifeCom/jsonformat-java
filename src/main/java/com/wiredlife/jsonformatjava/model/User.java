@@ -13,6 +13,13 @@ public class User {
 		this.zones = new ArrayList<Zone>();
 	}
 
+	public User(String username, List<Zone> zones, Inventory inventory) {
+		this();
+		this.username = username;
+		this.zones = zones;
+		this.inventory = inventory;
+	}
+
 	public void addZone(Zone zone) {
 		this.zones.add(zone);
 	}
