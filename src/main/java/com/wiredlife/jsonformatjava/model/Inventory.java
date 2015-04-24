@@ -18,7 +18,7 @@ public class Inventory {
 	}
 
 	public void deleteResource(String resource) {
-		this.resources.remove(this.resources.indexOf(resource));
+		this.resources.remove(resource);
 	}
 
 	public void addItem(String item) {
@@ -26,7 +26,7 @@ public class Inventory {
 	}
 
 	public void deleteItem(String item) {
-		this.items.remove(this.resources.indexOf(item));
+		this.items.remove(item);
 	}
 
 	public List<String> getResources() {

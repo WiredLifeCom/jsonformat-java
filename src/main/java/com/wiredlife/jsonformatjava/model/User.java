@@ -18,7 +18,7 @@ public class User {
 	}
 
 	public void deleteZone(Zone zone) {
-		this.zones.remove(this.zones.indexOf(zone));
+		this.zones.remove(zone);
 	}
 
 	public String getUsername() {
