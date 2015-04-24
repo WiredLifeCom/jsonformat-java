@@ -1,5 +1,6 @@
 package com.wiredlife.jsonformatjava.model;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class User {
@@ -7,6 +8,18 @@ public class User {
 	private String username;
 	private List<Zone> zones;
 	private Inventory inventory;
+
+	public User() {
+		this.zones = new ArrayList<Zone>();
+	}
+
+	public void addZone(Zone zone) {
+		this.zones.add(zone);
+	}
+
+	public void deleteZone(Zone zone) {
+		this.zones.remove(this.zones.indexOf(zone));
+	}
 
 	public String getUsername() {
 		return this.username;
