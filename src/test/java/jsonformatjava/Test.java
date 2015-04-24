@@ -1,5 +1,7 @@
 package jsonformatjava;
 
+import org.joda.time.DateTime;
+
 import com.wiredlife.jsonformatjava.model.Data;
 
 public class Test {
@@ -12,8 +14,8 @@ public class Test {
 		builder.append("\"username\": \"TestUser\",");
 		builder.append("\"zones\": [");
 		builder.append("{");
-		builder.append("\"arrival\": \"2015-04-21T11:42:11+00:00\",");
-		builder.append("\"departure\": \"2015-04-21T11:58:32+00:00\",");
+		builder.append("\"arrival\": \"2015-04-21T11:42:11.000+02:00\",");
+		builder.append("\"departure\": \"2015-04-21T11:58:32.000+02:00\",");
 		builder.append("\"latitude\": 55.615920,");
 		builder.append("\"longitude\": 12.987113");
 		builder.append("}");
@@ -30,13 +32,17 @@ public class Test {
 		builder.append("]");
 		builder.append("}");
 		builder.append("},");
-		builder.append("\"unload\" : \"2015-04-21T13:04:54+00:00\"");
+		builder.append("\"unload\" : \"2015-04-21T13:04:54.000+02:00\"");
 		// builder.append("}");
 		builder.append("}");
 
 		System.out.println(builder.toString());
 
 		Data data = Data.fromJson(builder.toString());
+
+		data.setUnload(DateTime.now());
+
+		System.out.println(data.getUnload());
 
 		System.out.println(data);
 	}
