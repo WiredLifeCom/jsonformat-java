@@ -16,29 +16,29 @@ public class Test {
 		StringBuilder builder = new StringBuilder();
 		builder.append("{");
 		// builder.append("\"data\": {");
-		builder.append("\"user\": {");
-		builder.append("\"username\": \"TestUser\",");
-		builder.append("\"zones\": [");
+		builder.append("\"user\":{");
+		builder.append("\"username\":\"TestUser\",");
+		builder.append("\"zones\":[");
 		builder.append("{");
-		builder.append("\"arrival\": \"2015-04-21T11:42:11.000+02:00\",");
-		builder.append("\"departure\": \"2015-04-21T11:58:32.000+02:00\",");
-		builder.append("\"latitude\": 55.615920,");
-		builder.append("\"longitude\": 12.987113");
+		builder.append("\"arrival\":\"2015-04-21T11:42:11.000+02:00\",");
+		builder.append("\"departure\":\"2015-04-21T11:58:32.000+02:00\",");
+		builder.append("\"latitude\":55.61592,");
+		builder.append("\"longitude\":12.987113");
 		builder.append("}");
 		builder.append("],");
-		builder.append("\"inventory\": {");
-		builder.append("\"resources\": [");
+		builder.append("\"inventory\":{");
+		builder.append("\"resources\":[");
 		builder.append("\"Dirt\",");
 		builder.append("\"Dirt\",");
 		builder.append("\"Stone\"");
 		builder.append("],");
-		builder.append("\"items\": [");
+		builder.append("\"items\":[");
 		builder.append("\"DiamondPickaxe\",");
 		builder.append("\"WoodenAxe\"");
 		builder.append("]");
 		builder.append("}");
 		builder.append("},");
-		builder.append("\"unload\" : \"2015-04-21T13:04:54.000+02:00\"");
+		builder.append("\"unload\":\"2015-04-21T13:04:54.000+02:00\"");
 		// builder.append("}");
 		builder.append("}");
 
@@ -64,7 +64,7 @@ public class Test {
 		Zone zone = new Zone();
 		zone.setArrival(DateTime.parse("2015-04-21T11:42:11.000+02:00"));
 		zone.setDeparture(DateTime.parse("2015-04-21T11:58:32.000+02:00"));
-		zone.setLatitude(55.615920);
+		zone.setLatitude(55.61592);
 		zone.setLongitude(12.987113);
 
 		List<Zone> zones = new ArrayList<Zone>();
@@ -81,6 +81,18 @@ public class Test {
 
 		System.out.println(newData);
 		System.out.println(Data.toJson(newData));
+
+		if (builder.toString().equals(Data.toJson(newData))) {
+			System.out.println("Is equals");
+		}
+
+		DateTime time1 = DateTime.parse("2015-04-21T11:42:11.000+02:00");
+		DateTime time2 = DateTime.now();
+
+		int result = time1.compareTo(time2);
+		if (result == -1) {
+			System.out.println("time1 is older than time2; expected outcome!");
+		}
 
 	}
 }
