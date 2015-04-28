@@ -5,6 +5,7 @@ import java.util.List;
 
 import org.joda.time.DateTime;
 
+import com.wiredlife.jsonformatjava.dba.SQLiteDBA;
 import com.wiredlife.jsonformatjava.model.Data;
 import com.wiredlife.jsonformatjava.model.Inventory;
 import com.wiredlife.jsonformatjava.model.User;
@@ -94,5 +95,15 @@ public class Test {
 			System.out.println("time1 is older than time2; expected outcome!");
 		}
 
+		SQLiteDBA dba = new SQLiteDBA("database.db");
+		dba.addUnload(Data.fromJson(builder.toString()));
+
+		List<String> contents = dba.getUnloads("TestUser");
+		System.out.println(contents);
+
+		dba.deleteUnloads("TestUser");
+
+		List<String> contents2 = dba.getUnloads("TestUser");
+		System.out.println(contents2);
 	}
 }
