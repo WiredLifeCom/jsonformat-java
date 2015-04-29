@@ -1,4 +1,4 @@
-package com.wiredlife.jsonformatjava.dba;
+package com.wiredlife.jsonformatjava.dba.unload;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -15,11 +15,11 @@ import com.wiredlife.jsonformatjava.model.unload.Unload;
 import com.wiredlife.jsonformatjava.model.unload.User;
 import com.wiredlife.jsonformatjava.model.unload.Zone;
 
-public class SQLiteDBA {
+public class UnloadDBA {
 
 	private Connection connection;
 
-	private SQLiteDBA() {
+	private UnloadDBA() {
 		try {
 			Class.forName("org.sqlite.JDBC");
 		} catch (ClassNotFoundException e) {
@@ -27,7 +27,7 @@ public class SQLiteDBA {
 		}
 	}
 
-	public SQLiteDBA(String database) {
+	public UnloadDBA(String database) {
 		this();
 		try {
 			this.connection = DriverManager.getConnection(String.format("jdbc:sqlite:%s", database));
@@ -132,17 +132,41 @@ public class SQLiteDBA {
 		}
 	}
 
-	public List<String> getUnloads(String username) {
+	public List<Unload> getUnloads(String username) {
 		try {
-			PreparedStatement statement = this.connection.prepareStatement("SELECT data FROM unloads WHERE username=?");
-			statement.setString(1, username);
-			ResultSet rs = statement.executeQuery();
+			PreparedStatement stmtGetUnloads = this.connection
+					.prepareStatement("SELECT users.UserID, usersunloads.UnloadID, unloads.Resource, unloadszones.Arrival, unloadszones.Departure, unloadszones.Latitude, unloadszones.Longitude "
+							+ "FROM users INNER JOIN usersunloads ON users.UserID = usersunloads.UserID "
+							+ "INNER JOIN unloads ON usersunloads.UnloadID = unloads.UnloadID INNER JOIN unloadszones ON usersunloads.UnloadID = unloadszones.UnloadID WHERE Username=?");
+			stmtGetUnloads.setString(1, username);
+			ResultSet rsGetUnloads = stmtGetUnloads.executeQuery();
 
-			List<String> datas = new ArrayList<String>();
-			while (rs.next()) {
-				datas.add(rs.getString("data"));
+			List<String> materials = new ArrayList<String>();
+			List<Zone> zones = new ArrayList<Zone>();
+
+			int currentUnloadID = -1;
+			while (rsGetUnloads.next()) {
+				if (currentUnloadID != rsGetUnloads.getInt("UnloadID")) {
+					currentUnloadID = rsGetUnloads.getInt("UnloadID");
+
+					User user = new User(username, zones, materials);
+					System.out.println(user);
+
+					// System.out.println(materials);
+					materials = new ArrayList<String>();
+
+					// System.out.println(zones);
+					zones = new ArrayList<Zone>();
+
+				}
+				// System.out.println(rsGetUnloads.getString("UnloadID") + " " +
+				// rsGetUnloads.getString("Resource") + " " +
+				// rsGetUnloads.getString("Arrival"));
+				materials.add(rsGetUnloads.getString("Resource"));
+				zones.add(new Zone(DateTime.parse(rsGetUnloads.getString("Arrival")), DateTime.parse(rsGetUnloads.getString("Departure")), rsGetUnloads.getDouble("Latitude"), rsGetUnloads
+						.getDouble("Longitude")));
 			}
-			return datas;
+
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
