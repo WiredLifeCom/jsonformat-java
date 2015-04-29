@@ -1,4 +1,4 @@
-package com.wiredlife.jsonformatjava.model;
+package com.wiredlife.jsonformatjava.model.unload;
 
 import org.joda.time.DateTime;
 
@@ -6,16 +6,16 @@ import com.fatboyindustrial.gsonjodatime.Converters;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
-public class Data {
+public class Unload {
 
 	private User user;
 	private DateTime unload;
 
-	public Data() {
+	public Unload() {
 
 	}
 
-	public Data(User user, DateTime unload) {
+	public Unload(User user, DateTime unload) {
 		this();
 		this.user = user;
 		this.unload = unload;
@@ -54,10 +54,10 @@ public class Data {
 		if (obj == null) {
 			return false;
 		}
-		if (!(obj instanceof Data)) {
+		if (!(obj instanceof Unload)) {
 			return false;
 		}
-		Data other = (Data) obj;
+		Unload other = (Unload) obj;
 		if (this.unload == null) {
 			if (other.unload != null) {
 				return false;
@@ -86,14 +86,14 @@ public class Data {
 		return builder.toString();
 	}
 
-	public static String toJson(Data data) {
+	public static String toJson(Unload data) {
 		Gson gson = Converters.registerDateTime(new GsonBuilder()).create();
 		return gson.toJson(data);
 	}
 
-	public static Data fromJson(String json) {
+	public static Unload fromJson(String json) {
 		Gson gson = Converters.registerDateTime(new GsonBuilder()).create();
-		return gson.fromJson(json, Data.class);
+		return gson.fromJson(json, Unload.class);
 	}
 
 }

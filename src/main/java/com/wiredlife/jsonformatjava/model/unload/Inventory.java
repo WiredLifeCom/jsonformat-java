@@ -1,4 +1,4 @@
-package com.wiredlife.jsonformatjava.model;
+package com.wiredlife.jsonformatjava.model.unload;
 
 import java.util.ArrayList;
 import java.util.List;

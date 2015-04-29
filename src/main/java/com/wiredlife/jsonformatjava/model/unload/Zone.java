@@ -1,4 +1,4 @@
-package com.wiredlife.jsonformatjava.model;
+package com.wiredlife.jsonformatjava.model.unload;
 
 import org.joda.time.DateTime;
 
