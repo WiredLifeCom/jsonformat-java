@@ -78,7 +78,7 @@ public class Unload {
 	@Override
 	public String toString() {
 		StringBuilder builder = new StringBuilder();
-		builder.append("Data [user=");
+		builder.append("Unload [user=");
 		builder.append(this.user);
 		builder.append(", unload=");
 		builder.append(this.unload);
@@ -86,9 +86,9 @@ public class Unload {
 		return builder.toString();
 	}
 
-	public static String toJson(Unload data) {
+	public static String toJson(Unload unload) {
 		Gson gson = Converters.registerDateTime(new GsonBuilder()).create();
-		return gson.toJson(data);
+		return gson.toJson(unload);
 	}
 
 	public static Unload fromJson(String json) {

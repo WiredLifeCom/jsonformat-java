@@ -5,11 +5,10 @@ import java.util.List;
 
 import org.joda.time.DateTime;
 
-import com.wiredlife.jsonformatjava.dba.SQLiteDBA;
-import com.wiredlife.jsonformatjava.model.Data;
-import com.wiredlife.jsonformatjava.model.Inventory;
-import com.wiredlife.jsonformatjava.model.User;
-import com.wiredlife.jsonformatjava.model.Zone;
+import com.wiredlife.jsonformatjava.dba.unload.UnloadDBA;
+import com.wiredlife.jsonformatjava.model.unload.Unload;
+import com.wiredlife.jsonformatjava.model.unload.User;
+import com.wiredlife.jsonformatjava.model.unload.Zone;
 
 public class Test {
 
@@ -43,24 +42,16 @@ public class Test {
 		// builder.append("}");
 		builder.append("}");
 
-		Data data = Data.fromJson(builder.toString());
+		Unload data = Unload.fromJson(builder.toString());
 
 		System.out.println(data);
 		System.out.println(builder.toString());
 
 		// Construct a Data object and convert it to JSON
-		List<String> resources = new ArrayList<String>();
-		resources.add("Dirt");
-		resources.add("Dirt");
-		resources.add("Stone");
-
-		List<String> items = new ArrayList<String>();
-		items.add("DiamondPickaxe");
-		items.add("WoodenAxe");
-
-		Inventory inventory = new Inventory();
-		inventory.setResources(resources);
-		inventory.setItems(items);
+		List<String> materials = new ArrayList<String>();
+		materials.add("Dirt");
+		materials.add("Dirt");
+		materials.add("Stone");
 
 		Zone zone = new Zone();
 		zone.setArrival(DateTime.parse("2015-04-21T11:42:11.000+02:00"));
@@ -74,16 +65,16 @@ public class Test {
 		User user = new User();
 		user.setUsername("TestUser");
 		user.setZones(zones);
-		user.setInventory(inventory);
+		user.setMaterials(materials);
 
-		Data newData = new Data();
+		Unload newData = new Unload();
 		newData.setUser(user);
 		newData.setUnload(DateTime.parse("2015-04-21T13:04:54.000+02:00"));
 
 		System.out.println(newData);
-		System.out.println(Data.toJson(newData));
+		System.out.println(Unload.toJson(newData));
 
-		if (builder.toString().equals(Data.toJson(newData))) {
+		if (builder.toString().equals(Unload.toJson(newData))) {
 			System.out.println("Is equals");
 		}
 
@@ -95,15 +86,21 @@ public class Test {
 			System.out.println("time1 is older than time2; expected outcome!");
 		}
 
-		SQLiteDBA dba = new SQLiteDBA("database.db");
-		dba.addUnload(Data.fromJson(builder.toString()));
+		UnloadDBA dba = new UnloadDBA("database.db");
+		// dba.addUnload(newData);
 
-		List<String> contents = dba.getUnloads("TestUser");
-		System.out.println(contents);
+		System.out.println(dba.getUsers());
 
-		dba.deleteUnloads("TestUser");
-
-		List<String> contents2 = dba.getUnloads("TestUser");
-		System.out.println(contents2);
+		System.out.println(dba.getUnloads("bejbejpomp"));
+		// System.out.println(dba.getUnloads(data.getUser().getUsername()));
+		// dba.addUnload(Data.fromJson(builder.toString()));
+		//
+		// List<String> contents = dba.getUnloads("TestUser");
+		// System.out.println(contents);
+		//
+		// dba.deleteUnloads("TestUser");
+		//
+		// List<String> contents2 = dba.getUnloads("TestUser");
+		// System.out.println(contents2);
 	}
 }
