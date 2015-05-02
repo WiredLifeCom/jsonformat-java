@@ -31,7 +31,8 @@ public class UnloadDBA {
 
 			Statement statement = this.connection.createStatement();
 			statement.executeUpdate("CREATE TABLE IF NOT EXISTS users (UserID integer, Username string unique, primary key (UserID))");
-			statement.executeUpdate("CREATE TABLE IF NOT EXISTS unloads (UnloadID integer, UserID integer, Data string, primary key (UnloadID) foreign key (UserID) references users(UserID))");
+			statement
+					.executeUpdate("CREATE TABLE IF NOT EXISTS unloads (UnloadID integer, UserID integer, Date date, Data string, primary key (UnloadID) foreign key (UserID) references users(UserID))");
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
@@ -56,9 +57,10 @@ public class UnloadDBA {
 			int userId = getLatestUserID();
 			System.out.println("UserID: " + userId);
 
-			PreparedStatement stmtInsertUnload = this.connection.prepareStatement("INSERT INTO unloads (UserID, Data) VALUES (?, ?)");
+			PreparedStatement stmtInsertUnload = this.connection.prepareStatement("INSERT INTO unloads (UserID, Date, Data) VALUES (?, ?, ?)");
 			stmtInsertUnload.setInt(1, userId);
-			stmtInsertUnload.setString(2, Unload.toJson(unload));
+			stmtInsertUnload.setString(2, unload.getUnload().toString());
+			stmtInsertUnload.setString(3, Unload.toJson(unload));
 			stmtInsertUnload.executeUpdate();
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
