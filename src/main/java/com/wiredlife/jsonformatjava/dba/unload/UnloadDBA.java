@@ -128,11 +128,11 @@ public class UnloadDBA {
 		}
 	}
 
-	public void deleteUnload(String username, DateTime unload) {
+	public void deleteUnload(Unload unload) {
 		try {
 			PreparedStatement statement = this.connection.prepareStatement("DELETE FROM unloads WHERE UserID=(SELECT UserID FROM users WHERE Username=?) AND Date=?");
-			statement.setString(1, username);
-			statement.setString(2, unload.toString());
+			statement.setString(1, unload.getUser().getUsername());
+			statement.setString(2, unload.getUnload().toString());
 			statement.executeUpdate();
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
