@@ -9,6 +9,8 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.joda.time.DateTime;
+
 import com.wiredlife.jsonformatjava.model.unload.Unload;
 import com.wiredlife.jsonformatjava.model.unload.User;
 
@@ -30,16 +32,17 @@ public class UnloadDBA {
 			this.connection = DriverManager.getConnection(String.format("jdbc:sqlite:%s", database));
 
 			Statement statement = this.connection.createStatement();
+			statement.executeUpdate("PRAGMA foreign_keys=ON");
 			statement.executeUpdate("CREATE TABLE IF NOT EXISTS users (UserID integer, Username string unique, primary key (UserID))");
 			statement
 					.executeUpdate("CREATE TABLE IF NOT EXISTS unloads (UnloadID integer, UserID integer, Date date, Data string, primary key (UnloadID) foreign key (UserID) references users(UserID))");
+			statement
+					.executeUpdate("CREATE TABLE IF NOT EXISTS unloadszones (UnloadID integer, Arrival date, Departure date, Latitude double, Longitude double, foreign key (UnloadID) references unloads(UnloadID) ON UPDATE CASCADE ON DELETE CASCADE)");
+			statement
+					.executeUpdate("CREATE TABLE IF NOT EXISTS unloadsmaterials (UnloadID integer, Material string, foreign key (UnloadID) references unloads(UnloadID) ON UPDATE CASCADE ON DELETE CASCADE)");
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
-	}
-
-	public List<User> getUsers() {
-		return null;
 	}
 
 	public void addUnload(Unload unload) {
@@ -54,14 +57,25 @@ public class UnloadDBA {
 				stmtInsertUser.executeUpdate();
 			}
 
-			int userId = getLatestUserID();
-			System.out.println("UserID: " + userId);
+			int latestUserID = getLatestUserID();
+			System.out.println("UserID: " + latestUserID);
 
 			PreparedStatement stmtInsertUnload = this.connection.prepareStatement("INSERT INTO unloads (UserID, Date, Data) VALUES (?, ?, ?)");
-			stmtInsertUnload.setInt(1, userId);
+			stmtInsertUnload.setInt(1, latestUserID);
 			stmtInsertUnload.setString(2, unload.getUnload().toString());
 			stmtInsertUnload.setString(3, Unload.toJson(unload));
 			stmtInsertUnload.executeUpdate();
+
+			PreparedStatement stmtInsertUnloadsMaterials = this.connection.prepareStatement("INSERT INTO unloadsmaterials (UnloadID, Material) VALUES (?, ?)");
+
+			int latestUnloadID = getLatestUnloadID();
+			System.out.println("UnloadID: " + latestUnloadID);
+
+			for (String material : unload.getUser().getMaterials()) {
+				stmtInsertUnloadsMaterials.setInt(1, latestUnloadID);
+				stmtInsertUnloadsMaterials.setString(2, material);
+				stmtInsertUnloadsMaterials.executeUpdate();
+			}
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -70,13 +84,30 @@ public class UnloadDBA {
 
 	public List<Unload> getUnloads(String username) {
 		try {
-			PreparedStatement stmtGetUnloads = this.connection.prepareStatement("SELECT Data FROM unloads INNER JOIN users ON unloads.UserID = users.UserID WHERE users.Username=?");
-			stmtGetUnloads.setString(1, username);
-			ResultSet rsGetUnloads = stmtGetUnloads.executeQuery();
-
 			List<Unload> unloads = new ArrayList<Unload>();
-			while (rsGetUnloads.next()) {
-				unloads.add(Unload.fromJson(rsGetUnloads.getString("Data")));
+
+			PreparedStatement stmtGetUnloadIds = this.connection.prepareStatement("SELECT UnloadID, Date FROM unloads INNER JOIN users ON unloads.UserID = users.UserID WHERE Username=?");
+			stmtGetUnloadIds.setString(1, username);
+			ResultSet rsGetUnloadIds = stmtGetUnloadIds.executeQuery();
+
+			while (rsGetUnloadIds.next()) {
+				Unload unload = new Unload();
+
+				User user = new User();
+				user.setUsername(username);
+
+				PreparedStatement stmtGetUnloadsMaterials = this.connection.prepareStatement("SELECT Material FROM unloadsmaterials WHERE UnloadID=?");
+				stmtGetUnloadsMaterials.setInt(1, rsGetUnloadIds.getInt("UnloadID"));
+				ResultSet rsGetUnloadsMaterials = stmtGetUnloadsMaterials.executeQuery();
+
+				while (rsGetUnloadsMaterials.next()) {
+					user.addMaterial(rsGetUnloadsMaterials.getString("Material"));
+				}
+
+				unload.setUser(user);
+				unload.setUnload(DateTime.parse(rsGetUnloadIds.getString("Date")));
+
+				unloads.add(unload);
 			}
 			return unloads;
 		} catch (SQLException e) {
@@ -88,10 +119,23 @@ public class UnloadDBA {
 
 	public void deleteUnloads(String username) {
 		try {
-			PreparedStatement statement = this.connection.prepareStatement("DELETE FROM unloads WHERE username=?");
+			PreparedStatement statement = this.connection.prepareStatement("DELETE FROM unloads WHERE UserID=(SELECT UserID FROM users WHERE Username=?)");
 			statement.setString(1, username);
 			statement.executeUpdate();
 		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+
+	public void deleteUnload(String username, DateTime unload) {
+		try {
+			PreparedStatement statement = this.connection.prepareStatement("DELETE FROM unloads WHERE UserID=(SELECT UserID FROM users WHERE Username=?) AND Date=?");
+			statement.setString(1, username);
+			statement.setString(2, unload.toString());
+			statement.executeUpdate();
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
@@ -103,7 +147,7 @@ public class UnloadDBA {
 		} catch (SQLException e) {
 			// Swallow exception
 		}
-		return -1;
+		return 1;
 	}
 
 	private int getLatestUnloadID() {
@@ -113,7 +157,7 @@ public class UnloadDBA {
 		} catch (SQLException e) {
 			// Swallow exception
 		}
-		return -1;
+		return 1;
 	}
 
 }
