@@ -29,6 +29,14 @@ public class User {
 		this.zones.remove(zone);
 	}
 
+	public void addMaterial(String material) {
+		this.materials.add(material);
+	}
+
+	public void deleteMaterial(String material) {
+		this.materials.remove(material);
+	}
+
 	public String getUsername() {
 		return this.username;
 	}
