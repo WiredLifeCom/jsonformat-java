@@ -71,7 +71,7 @@ public class UnloadDBA {
 			int latestUnloadID = getLatestUnloadID();
 			System.out.println("UnloadID: " + latestUnloadID);
 
-			for (String material : unload.getUser().getMaterials()) {
+			for (String material : unload.getMaterials()) {
 				stmtInsertUnloadsMaterials.setInt(1, latestUnloadID);
 				stmtInsertUnloadsMaterials.setString(2, material);
 				stmtInsertUnloadsMaterials.executeUpdate();
@@ -101,7 +101,7 @@ public class UnloadDBA {
 				ResultSet rsGetUnloadsMaterials = stmtGetUnloadsMaterials.executeQuery();
 
 				while (rsGetUnloadsMaterials.next()) {
-					user.addMaterial(rsGetUnloadsMaterials.getString("Material"));
+					unload.addMaterial(rsGetUnloadsMaterials.getString("Material"));
 				}
 
 				unload.setUser(user);

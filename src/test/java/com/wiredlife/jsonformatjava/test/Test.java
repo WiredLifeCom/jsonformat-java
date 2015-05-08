@@ -17,7 +17,7 @@ public class Test {
 		builder.append("{");
 		// builder.append("\"data\": {");
 		builder.append("\"user\":{");
-		builder.append("\"username\":\"TestUser\",");
+		builder.append("\"username\":\"bejbejpomp\",");
 		builder.append("\"zones\":[");
 		builder.append("{");
 		builder.append("\"arrival\":\"2015-04-21T11:42:11.000+02:00\",");
@@ -26,21 +26,17 @@ public class Test {
 		builder.append("\"longitude\":12.987113");
 		builder.append("}");
 		builder.append("],");
-		builder.append("\"inventory\":{");
-		builder.append("\"resources\":[");
+		builder.append("\"materials\":[");
 		builder.append("\"Dirt\",");
 		builder.append("\"Dirt\",");
 		builder.append("\"Stone\"");
-		builder.append("],");
-		builder.append("\"items\":[");
-		builder.append("\"DiamondPickaxe\",");
-		builder.append("\"WoodenAxe\"");
 		builder.append("]");
-		builder.append("}");
 		builder.append("},");
 		builder.append("\"unload\":\"2015-04-21T13:04:54.000+02:00\"");
 		// builder.append("}");
 		builder.append("}");
+
+		System.out.println(builder.toString());
 
 		Unload data = Unload.fromJson(builder.toString());
 
@@ -63,18 +59,20 @@ public class Test {
 		zones.add(zone);
 
 		User user = new User();
-		user.setUsername("TestUser");
-		user.setZones(zones);
-		user.setMaterials(materials);
+		user.setUsername("bejbejpomp");
 
-		Unload newData = new Unload();
-		newData.setUser(user);
-		newData.setUnload(DateTime.parse("2015-04-21T13:04:54.000+02:00"));
+		Unload unload = new Unload();
+		unload.setUser(user);
 
-		System.out.println(newData);
-		System.out.println(Unload.toJson(newData));
+		unload.setZones(zones);
+		unload.setMaterials(materials);
 
-		if (builder.toString().equals(Unload.toJson(newData))) {
+		unload.setUnload(DateTime.parse("2015-04-21T13:04:54.000+02:00"));
+
+		System.out.println(unload);
+		System.out.println(Unload.toJson(unload));
+
+		if (builder.toString().equals(Unload.toJson(unload))) {
 			System.out.println("Is equals");
 		}
 
@@ -87,11 +85,9 @@ public class Test {
 		}
 
 		UnloadDBA dba = new UnloadDBA("database.db");
-		// dba.addUnload(newData);
+		dba.addUnload(unload);
 
-		System.out.println(dba.getUsers());
-
-		System.out.println(dba.getUnloads("bejbejpomp"));
+		System.out.println(dba.getUnloads("TestUser"));
 		// System.out.println(dba.getUnloads(data.getUser().getUsername()));
 		// dba.addUnload(Data.fromJson(builder.toString()));
 		//
