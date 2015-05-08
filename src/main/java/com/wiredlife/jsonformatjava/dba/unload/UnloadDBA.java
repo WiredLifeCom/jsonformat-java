@@ -20,8 +20,8 @@ public class UnloadDBA {
 
 	private UnloadDBA() {
 		try {
-			Class.forName("org.sqlite.JDBC");
-		} catch (ClassNotFoundException e) {
+			DriverManager.registerDriver(new org.sqlite.JDBC());
+		} catch (SQLException e) {
 			e.printStackTrace();
 		}
 	}
@@ -29,7 +29,7 @@ public class UnloadDBA {
 	public UnloadDBA(String database) {
 		this();
 		try {
-			this.connection = DriverManager.getConnection(String.format("jdbc:sqlite:%s", database));
+			this.connection = DriverManager.getConnection(String.format("jdbc:sqlite:%s.sqlite", database));
 
 			Statement statement = this.connection.createStatement();
 			statement.executeUpdate("PRAGMA foreign_keys=ON");
