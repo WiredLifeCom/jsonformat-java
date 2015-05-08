@@ -105,3 +105,4 @@ proguard/
 /local_resources
 *pi.zip
 *curl.zip
+*.sqlite
