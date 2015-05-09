@@ -55,8 +55,15 @@ public class Test {
 		zone.setLatitude(55.61592);
 		zone.setLongitude(12.987113);
 
+		Zone zone2 = new Zone();
+		zone2.setArrival(DateTime.now());
+		zone2.setDeparture(DateTime.now());
+		zone2.setLatitude(32.42154);
+		zone2.setLongitude(14.15231);
+
 		List<Zone> zones = new ArrayList<Zone>();
 		zones.add(zone);
+		zones.add(zone2);
 
 		User user = new User();
 		user.setUsername("bejbejpomp");
@@ -88,6 +95,9 @@ public class Test {
 		dba.addUnload(unload);
 
 		System.out.println(dba.getUnloads("bejbejpomp"));
+
+		List<Unload> dbaUnloads = dba.getUnloads("bejbejpomp");
+		System.out.println(Unload.toJson(dbaUnloads.get(dbaUnloads.size() - 1)));
 		// System.out.println(dba.getUnloads(data.getUser().getUsername()));
 		// dba.addUnload(Data.fromJson(builder.toString()));
 		//

@@ -13,6 +13,7 @@ import org.joda.time.DateTime;
 
 import com.wiredlife.jsonformatjava.model.unload.Unload;
 import com.wiredlife.jsonformatjava.model.unload.User;
+import com.wiredlife.jsonformatjava.model.unload.Zone;
 import com.wiredlife.jsonformatjava.utility.OSValidator;
 import com.wiredlife.jsonformatjava.utility.OSValidator.OS;
 
@@ -40,8 +41,7 @@ public class UnloadDBA {
 			Statement statement = this.connection.createStatement();
 			statement.executeUpdate("PRAGMA foreign_keys=ON");
 			statement.executeUpdate("CREATE TABLE IF NOT EXISTS users (UserID integer, Username string unique, primary key (UserID))");
-			statement
-					.executeUpdate("CREATE TABLE IF NOT EXISTS unloads (UnloadID integer, UserID integer, Date date, Data string, primary key (UnloadID) foreign key (UserID) references users(UserID))");
+			statement.executeUpdate("CREATE TABLE IF NOT EXISTS unloads (UnloadID integer, UserID integer, Date date, primary key (UnloadID) foreign key (UserID) references users(UserID))");
 			statement
 					.executeUpdate("CREATE TABLE IF NOT EXISTS unloadszones (UnloadID integer, Arrival date, Departure date, Latitude double, Longitude double, foreign key (UnloadID) references unloads(UnloadID) ON UPDATE CASCADE ON DELETE CASCADE)");
 			statement
@@ -65,15 +65,25 @@ public class UnloadDBA {
 
 			int latestUserID = getLatestUserID();
 
-			PreparedStatement stmtInsertUnload = this.connection.prepareStatement("INSERT INTO unloads (UserID, Date, Data) VALUES (?, ?, ?)");
+			PreparedStatement stmtInsertUnload = this.connection.prepareStatement("INSERT INTO unloads (UserID, Date) VALUES (?, ?)");
 			stmtInsertUnload.setInt(1, latestUserID);
 			stmtInsertUnload.setString(2, unload.getUnload().toString());
-			stmtInsertUnload.setString(3, Unload.toJson(unload));
 			stmtInsertUnload.executeUpdate();
 
-			PreparedStatement stmtInsertUnloadsMaterials = this.connection.prepareStatement("INSERT INTO unloadsmaterials (UnloadID, Material) VALUES (?, ?)");
-
 			int latestUnloadID = getLatestUnloadID();
+
+			PreparedStatement stmtInsertUnloadsZones = this.connection.prepareStatement("INSERT INTO unloadszones (UnloadID, Arrival, Departure, Latitude, Longitude) VALUES (?, ?, ?, ?, ?)");
+
+			for (Zone zone : unload.getZones()) {
+				stmtInsertUnloadsZones.setInt(1, latestUnloadID);
+				stmtInsertUnloadsZones.setString(2, zone.getArrival().toString());
+				stmtInsertUnloadsZones.setString(3, zone.getDeparture().toString());
+				stmtInsertUnloadsZones.setDouble(4, zone.getLatitude());
+				stmtInsertUnloadsZones.setDouble(5, zone.getLongitude());
+				stmtInsertUnloadsZones.executeUpdate();
+			}
+
+			PreparedStatement stmtInsertUnloadsMaterials = this.connection.prepareStatement("INSERT INTO unloadsmaterials (UnloadID, Material) VALUES (?, ?)");
 
 			for (String material : unload.getMaterials()) {
 				stmtInsertUnloadsMaterials.setInt(1, latestUnloadID);
@@ -99,6 +109,20 @@ public class UnloadDBA {
 
 				User user = new User();
 				user.setUsername(username);
+
+				PreparedStatement stmtGetUnloadsZones = this.connection.prepareStatement("SELECT Arrival, Departure, Latitude, Longitude FROM unloadszones WHERE UnloadID=?");
+				stmtGetUnloadsZones.setInt(1, rsGetUnloadIds.getInt("UnloadID"));
+				ResultSet rsGetUnloadsZones = stmtGetUnloadsZones.executeQuery();
+
+				while (rsGetUnloadsZones.next()) {
+					Zone zone = new Zone();
+					zone.setArrival(DateTime.parse(rsGetUnloadsZones.getString("Arrival")));
+					zone.setDeparture(DateTime.parse(rsGetUnloadsZones.getString("Departure")));
+					zone.setLatitude(rsGetUnloadsZones.getDouble("Latitude"));
+					zone.setLongitude(rsGetUnloadsZones.getDouble("Longitude"));
+
+					unload.addZone(zone);
+				}
 
 				PreparedStatement stmtGetUnloadsMaterials = this.connection.prepareStatement("SELECT Material FROM unloadsmaterials WHERE UnloadID=?");
 				stmtGetUnloadsMaterials.setInt(1, rsGetUnloadIds.getInt("UnloadID"));
