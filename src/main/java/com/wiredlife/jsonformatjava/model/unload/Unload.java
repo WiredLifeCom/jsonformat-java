@@ -12,19 +12,22 @@ import com.google.gson.GsonBuilder;
 public class Unload {
 
 	private User user;
-	private DateTime unload;
 
 	private List<Zone> zones;
 	private List<String> materials;
+
+	private DateTime unload;
 
 	public Unload() {
 		this.zones = new ArrayList<Zone>();
 		this.materials = new ArrayList<String>();
 	}
 
-	public Unload(User user, DateTime unload) {
+	public Unload(User user, List<Zone> zones, List<String> materials, DateTime unload) {
 		this();
 		this.user = user;
+		this.zones = zones;
+		this.materials = materials;
 		this.unload = unload;
 	}
 
@@ -52,14 +55,6 @@ public class Unload {
 		this.user = user;
 	}
 
-	public void setUnload(DateTime unload) {
-		this.unload = unload;
-	}
-
-	public DateTime getUnload() {
-		return this.unload;
-	}
-
 	public List<String> getMaterials() {
 		return this.materials;
 	}
@@ -74,6 +69,14 @@ public class Unload {
 
 	public void setZones(List<Zone> zones) {
 		this.zones = zones;
+	}
+
+	public void setUnload(DateTime unload) {
+		this.unload = unload;
+	}
+
+	public DateTime getUnload() {
+		return this.unload;
 	}
 
 	@Override

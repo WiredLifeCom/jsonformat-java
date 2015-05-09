@@ -1,7 +1,5 @@
 package com.wiredlife.jsonformatjava.model.unload;
 
-import java.util.List;
-
 public class User {
 
 	private String username;
@@ -10,7 +8,7 @@ public class User {
 
 	}
 
-	public User(String username, List<Zone> zones, List<String> materials) {
+	public User(String username) {
 		this();
 		this.username = username;
 	}
