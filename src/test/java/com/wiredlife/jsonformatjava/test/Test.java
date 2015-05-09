@@ -17,7 +17,8 @@ public class Test {
 		builder.append("{");
 		// builder.append("\"data\": {");
 		builder.append("\"user\":{");
-		builder.append("\"username\":\"bejbejpomp\",");
+		builder.append("\"username\":\"bejbejpomp\"");
+		builder.append("},");
 		builder.append("\"zones\":[");
 		builder.append("{");
 		builder.append("\"arrival\":\"2015-04-21T11:42:11.000+02:00\",");
@@ -30,8 +31,7 @@ public class Test {
 		builder.append("\"Dirt\",");
 		builder.append("\"Dirt\",");
 		builder.append("\"Stone\"");
-		builder.append("]");
-		builder.append("},");
+		builder.append("],");
 		builder.append("\"unload\":\"2015-04-21T13:04:54.000+02:00\"");
 		// builder.append("}");
 		builder.append("}");
@@ -84,10 +84,10 @@ public class Test {
 			System.out.println("time1 is older than time2; expected outcome!");
 		}
 
-		UnloadDBA dba = new UnloadDBA("database.db");
+		UnloadDBA dba = new UnloadDBA("database.sqlite");
 		dba.addUnload(unload);
 
-		System.out.println(dba.getUnloads("TestUser"));
+		System.out.println(dba.getUnloads("bejbejpomp"));
 		// System.out.println(dba.getUnloads(data.getUser().getUsername()));
 		// dba.addUnload(Data.fromJson(builder.toString()));
 		//

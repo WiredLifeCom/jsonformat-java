@@ -13,6 +13,8 @@ import org.joda.time.DateTime;
 
 import com.wiredlife.jsonformatjava.model.unload.Unload;
 import com.wiredlife.jsonformatjava.model.unload.User;
+import com.wiredlife.jsonformatjava.utility.OSValidator;
+import com.wiredlife.jsonformatjava.utility.OSValidator.OS;
 
 public class UnloadDBA {
 
@@ -20,7 +22,11 @@ public class UnloadDBA {
 
 	private UnloadDBA() {
 		try {
-			DriverManager.registerDriver(new org.sqlite.JDBC());
+			if (OSValidator.getOS().equals(OS.ANDROID)) {
+				DriverManager.registerDriver(new org.sqldroid.SQLDroidDriver());
+			} else {
+				DriverManager.registerDriver(new org.sqlite.JDBC());
+			}
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
@@ -29,7 +35,7 @@ public class UnloadDBA {
 	public UnloadDBA(String database) {
 		this();
 		try {
-			this.connection = DriverManager.getConnection(String.format("jdbc:sqlite:%s.sqlite", database));
+			this.connection = DriverManager.getConnection(String.format("jdbc:sqlite:%s", database));
 
 			Statement statement = this.connection.createStatement();
 			statement.executeUpdate("PRAGMA foreign_keys=ON");
@@ -58,7 +64,6 @@ public class UnloadDBA {
 			}
 
 			int latestUserID = getLatestUserID();
-			System.out.println("UserID: " + latestUserID);
 
 			PreparedStatement stmtInsertUnload = this.connection.prepareStatement("INSERT INTO unloads (UserID, Date, Data) VALUES (?, ?, ?)");
 			stmtInsertUnload.setInt(1, latestUserID);
@@ -69,7 +74,6 @@ public class UnloadDBA {
 			PreparedStatement stmtInsertUnloadsMaterials = this.connection.prepareStatement("INSERT INTO unloadsmaterials (UnloadID, Material) VALUES (?, ?)");
 
 			int latestUnloadID = getLatestUnloadID();
-			System.out.println("UnloadID: " + latestUnloadID);
 
 			for (String material : unload.getMaterials()) {
 				stmtInsertUnloadsMaterials.setInt(1, latestUnloadID);
@@ -143,7 +147,11 @@ public class UnloadDBA {
 	private int getLatestUserID() {
 		try {
 			Statement statement = this.connection.createStatement();
-			return statement.executeQuery("SELECT UserID FROM users ORDER BY UserID DESC LIMIT 1").getInt("UserID");
+			ResultSet rs = statement.executeQuery("SELECT UserID FROM users ORDER BY UserID DESC LIMIT 1");
+			while (rs.next()) {
+				return rs.getInt("UserID");
+			}
+			return 1;
 		} catch (SQLException e) {
 			// Swallow exception
 		}
@@ -153,7 +161,11 @@ public class UnloadDBA {
 	private int getLatestUnloadID() {
 		try {
 			Statement statement = this.connection.createStatement();
-			return statement.executeQuery("SELECT UnloadID FROM unloads ORDER BY UnloadID DESC LIMIT 1").getInt("UnloadID");
+			ResultSet rs = statement.executeQuery("SELECT UnloadID FROM unloads ORDER BY UnloadID DESC LIMIT 1");
+			while (rs.next()) {
+				return rs.getInt("UnloadID");
+			}
+			return 1;
 		} catch (SQLException e) {
 			// Swallow exception
 		}
