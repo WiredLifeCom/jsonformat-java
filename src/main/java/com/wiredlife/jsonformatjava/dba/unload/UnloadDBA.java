@@ -201,4 +201,15 @@ public class UnloadDBA {
 		return 1;
 	}
 
+	public void close() {
+		if (this.connection != null) {
+			try {
+				this.connection.close();
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+	}
+
 }
