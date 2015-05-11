@@ -113,7 +113,7 @@ public class UnloadDBA {
 				User user = new User();
 				user.setUsername(username);
 
-				PreparedStatement stmtGetUnloadsZones = this.connection.prepareStatement("SELECT Arrival, Departure, Latitude, Longitude FROM unloadszones WHERE UnloadID=?");
+				PreparedStatement stmtGetUnloadsZones = this.connection.prepareStatement("SELECT Latitude, Longitude, Radius, Material, Arrival, Departure FROM unloadszones WHERE UnloadID=?");
 				stmtGetUnloadsZones.setInt(1, rsGetUnloadIds.getInt("UnloadID"));
 				ResultSet rsGetUnloadsZones = stmtGetUnloadsZones.executeQuery();
 
