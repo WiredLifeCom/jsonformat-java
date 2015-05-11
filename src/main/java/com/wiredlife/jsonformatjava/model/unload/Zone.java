@@ -4,37 +4,29 @@ import org.joda.time.DateTime;
 
 public class Zone {
 
-	private DateTime arrival;
-	private DateTime departure;
-
 	private double latitude;
 	private double longitude;
+	private int radius;
+	private String material;
+
+	private DateTime arrival;
+	private DateTime departure;
 
 	public Zone() {
 
 	}
 
-	public Zone(DateTime arrival, DateTime departure, double latitude, double longitude) {
+	public Zone(double latitude, double longitude, int radius, String material) {
 		this();
-		this.arrival = arrival;
-		this.departure = departure;
+		this.radius = radius;
+		this.material = material;
 		this.latitude = latitude;
 		this.longitude = longitude;
 	}
 
-	public DateTime getArrival() {
-		return this.arrival;
-	}
-
-	public void setArrival(DateTime arrival) {
+	public Zone(double latitude, double longitude, int radius, String material, DateTime arrival, DateTime departure) {
+		this();
 		this.arrival = arrival;
-	}
-
-	public DateTime getDeparture() {
-		return this.departure;
-	}
-
-	public void setDeparture(DateTime departure) {
 		this.departure = departure;
 	}
 
@@ -54,6 +46,38 @@ public class Zone {
 		this.longitude = longitude;
 	}
 
+	public int getRadius() {
+		return this.radius;
+	}
+
+	public void setRadius(int radius) {
+		this.radius = radius;
+	}
+
+	public String getMaterial() {
+		return this.material;
+	}
+
+	public void setMaterial(String material) {
+		this.material = material;
+	}
+
+	public DateTime getArrival() {
+		return this.arrival;
+	}
+
+	public void setArrival(DateTime arrival) {
+		this.arrival = arrival;
+	}
+
+	public DateTime getDeparture() {
+		return this.departure;
+	}
+
+	public void setDeparture(DateTime departure) {
+		this.departure = departure;
+	}
+
 	@Override
 	public int hashCode() {
 		final int prime = 31;
@@ -65,6 +89,8 @@ public class Zone {
 		result = prime * result + (int) (temp ^ (temp >>> 32));
 		temp = Double.doubleToLongBits(this.longitude);
 		result = prime * result + (int) (temp ^ (temp >>> 32));
+		result = prime * result + ((this.material == null) ? 0 : this.material.hashCode());
+		result = prime * result + this.radius;
 		return result;
 	}
 
@@ -100,20 +126,34 @@ public class Zone {
 		if (Double.doubleToLongBits(this.longitude) != Double.doubleToLongBits(other.longitude)) {
 			return false;
 		}
+		if (this.material == null) {
+			if (other.material != null) {
+				return false;
+			}
+		} else if (!this.material.equals(other.material)) {
+			return false;
+		}
+		if (this.radius != other.radius) {
+			return false;
+		}
 		return true;
 	}
 
 	@Override
 	public String toString() {
 		StringBuilder builder = new StringBuilder();
-		builder.append("Zone [arrival=");
-		builder.append(this.arrival);
-		builder.append(", departure=");
-		builder.append(this.departure);
-		builder.append(", latitude=");
+		builder.append("Zone [latitude=");
 		builder.append(this.latitude);
 		builder.append(", longitude=");
 		builder.append(this.longitude);
+		builder.append(", radius=");
+		builder.append(this.radius);
+		builder.append(", material=");
+		builder.append(this.material);
+		builder.append(", arrival=");
+		builder.append(this.arrival);
+		builder.append(", departure=");
+		builder.append(this.departure);
 		builder.append("]");
 		return builder.toString();
 	}

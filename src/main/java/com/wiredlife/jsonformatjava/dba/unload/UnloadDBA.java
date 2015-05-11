@@ -43,7 +43,7 @@ public class UnloadDBA {
 			statement.executeUpdate("CREATE TABLE IF NOT EXISTS users (UserID integer, Username string unique, primary key (UserID))");
 			statement.executeUpdate("CREATE TABLE IF NOT EXISTS unloads (UnloadID integer, UserID integer, Date date, primary key (UnloadID) foreign key (UserID) references users(UserID))");
 			statement
-					.executeUpdate("CREATE TABLE IF NOT EXISTS unloadszones (UnloadID integer, Arrival date, Departure date, Latitude double, Longitude double, foreign key (UnloadID) references unloads(UnloadID) ON UPDATE CASCADE ON DELETE CASCADE)");
+					.executeUpdate("CREATE TABLE IF NOT EXISTS unloadszones (UnloadID integer, Latitude double, Longitude double, Radius integer, Material string, Arrival date, Departure date, foreign key (UnloadID) references unloads(UnloadID) ON UPDATE CASCADE ON DELETE CASCADE)");
 			statement
 					.executeUpdate("CREATE TABLE IF NOT EXISTS unloadsmaterials (UnloadID integer, Material string, foreign key (UnloadID) references unloads(UnloadID) ON UPDATE CASCADE ON DELETE CASCADE)");
 		} catch (SQLException e) {
@@ -72,14 +72,17 @@ public class UnloadDBA {
 
 			int latestUnloadID = getLatestUnloadID();
 
-			PreparedStatement stmtInsertUnloadsZones = this.connection.prepareStatement("INSERT INTO unloadszones (UnloadID, Arrival, Departure, Latitude, Longitude) VALUES (?, ?, ?, ?, ?)");
+			PreparedStatement stmtInsertUnloadsZones = this.connection
+					.prepareStatement("INSERT INTO unloadszones (UnloadID, Latitude, Longitude, Radius, Material, Arrival, Departure) VALUES (?, ?, ?, ?, ?, ?, ?)");
 
 			for (Zone zone : unload.getZones()) {
 				stmtInsertUnloadsZones.setInt(1, latestUnloadID);
-				stmtInsertUnloadsZones.setString(2, zone.getArrival().toString());
-				stmtInsertUnloadsZones.setString(3, zone.getDeparture().toString());
-				stmtInsertUnloadsZones.setDouble(4, zone.getLatitude());
-				stmtInsertUnloadsZones.setDouble(5, zone.getLongitude());
+				stmtInsertUnloadsZones.setDouble(2, zone.getLatitude());
+				stmtInsertUnloadsZones.setDouble(3, zone.getLongitude());
+				stmtInsertUnloadsZones.setInt(4, zone.getRadius());
+				stmtInsertUnloadsZones.setString(5, zone.getMaterial());
+				stmtInsertUnloadsZones.setString(6, zone.getArrival().toString());
+				stmtInsertUnloadsZones.setString(7, zone.getDeparture().toString());
 				stmtInsertUnloadsZones.executeUpdate();
 			}
 
@@ -116,10 +119,12 @@ public class UnloadDBA {
 
 				while (rsGetUnloadsZones.next()) {
 					Zone zone = new Zone();
-					zone.setArrival(DateTime.parse(rsGetUnloadsZones.getString("Arrival")));
-					zone.setDeparture(DateTime.parse(rsGetUnloadsZones.getString("Departure")));
 					zone.setLatitude(rsGetUnloadsZones.getDouble("Latitude"));
 					zone.setLongitude(rsGetUnloadsZones.getDouble("Longitude"));
+					zone.setRadius(rsGetUnloadsZones.getInt("Radius"));
+					zone.setMaterial(rsGetUnloadsZones.getString("Material"));
+					zone.setArrival(DateTime.parse(rsGetUnloadsZones.getString("Arrival")));
+					zone.setDeparture(DateTime.parse(rsGetUnloadsZones.getString("Departure")));
 
 					unload.addZone(zone);
 				}
