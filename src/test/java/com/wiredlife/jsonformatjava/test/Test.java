@@ -21,10 +21,12 @@ public class Test {
 		builder.append("},");
 		builder.append("\"zones\":[");
 		builder.append("{");
-		builder.append("\"arrival\":\"2015-04-21T11:42:11.000+02:00\",");
-		builder.append("\"departure\":\"2015-04-21T11:58:32.000+02:00\",");
 		builder.append("\"latitude\":55.61592,");
 		builder.append("\"longitude\":12.987113");
+		builder.append("\"radius:30\",");
+		builder.append("\"material\":\"Dirt\",");
+		builder.append("\"arrival\":\"2015-04-21T11:42:11.000+02:00\",");
+		builder.append("\"departure\":\"2015-04-21T11:58:32.000+02:00\"");
 		builder.append("}");
 		builder.append("],");
 		builder.append("\"materials\":[");
@@ -50,16 +52,20 @@ public class Test {
 		materials.add("Stone");
 
 		Zone zone = new Zone();
-		zone.setArrival(DateTime.parse("2015-04-21T11:42:11.000+02:00"));
-		zone.setDeparture(DateTime.parse("2015-04-21T11:58:32.000+02:00"));
 		zone.setLatitude(55.61592);
 		zone.setLongitude(12.987113);
+		zone.setRadius(20);
+		zone.setMaterial("Dirt");
+		zone.setArrival(DateTime.parse("2015-04-21T11:42:11.000+02:00"));
+		zone.setDeparture(DateTime.parse("2015-04-21T11:58:32.000+02:00"));
 
 		Zone zone2 = new Zone();
-		zone2.setArrival(DateTime.now());
-		zone2.setDeparture(DateTime.now());
 		zone2.setLatitude(32.42154);
 		zone2.setLongitude(14.15231);
+		zone2.setRadius(80);
+		zone2.setMaterial("Wood");
+		zone2.setArrival(DateTime.now());
+		zone2.setDeparture(DateTime.now());
 
 		List<Zone> zones = new ArrayList<Zone>();
 		zones.add(zone);
