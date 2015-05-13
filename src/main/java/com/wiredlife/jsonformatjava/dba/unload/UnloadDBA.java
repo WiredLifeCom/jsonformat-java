@@ -183,6 +183,7 @@ public class UnloadDBA {
 			return 1;
 		} catch (SQLException e) {
 			// Swallow exception
+			e.printStackTrace();
 		}
 		return 1;
 	}
@@ -197,6 +198,7 @@ public class UnloadDBA {
 			return 1;
 		} catch (SQLException e) {
 			// Swallow exception
+			e.printStackTrace();
 		}
 		return 1;
 	}
