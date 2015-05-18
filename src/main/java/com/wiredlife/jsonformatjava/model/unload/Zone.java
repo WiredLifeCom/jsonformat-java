@@ -24,12 +24,6 @@ public class Zone {
 		this.longitude = longitude;
 	}
 
-	public Zone(double latitude, double longitude, int radius, String material, DateTime arrival, DateTime departure) {
-		this();
-		this.arrival = arrival;
-		this.departure = departure;
-	}
-
 	public double getLatitude() {
 		return this.latitude;
 	}
