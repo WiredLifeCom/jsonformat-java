@@ -1,4 +1,4 @@
-package com.wiredlife.jsonformatjava.dba.unload;
+package com.wiredlife.jsonformatjava.dba;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -14,14 +14,19 @@ import org.joda.time.DateTime;
 import com.wiredlife.jsonformatjava.model.unload.Unload;
 import com.wiredlife.jsonformatjava.model.unload.User;
 import com.wiredlife.jsonformatjava.model.unload.Zone;
+import com.wiredlife.jsonformatjava.utility.Lock;
 import com.wiredlife.jsonformatjava.utility.OSValidator;
 import com.wiredlife.jsonformatjava.utility.OSValidator.OS;
 
-public class UnloadDBA {
+public class DBA {
+
+	private Lock lock;
 
 	private Connection connection;
 
-	private UnloadDBA() {
+	private DBA() {
+		this.lock = new Lock();
+
 		try {
 			if (OSValidator.getOS().equals(OS.ANDROID)) {
 				DriverManager.registerDriver(new org.sqldroid.SQLDroidDriver());
@@ -33,7 +38,7 @@ public class UnloadDBA {
 		}
 	}
 
-	public UnloadDBA(String database) {
+	public DBA(String database) {
 		this();
 		try {
 			this.connection = DriverManager.getConnection(String.format("jdbc:sqlite:%s", database));
@@ -52,6 +57,13 @@ public class UnloadDBA {
 	}
 
 	public void addUnload(Unload unload) {
+		try {
+			this.lock.lock();
+		} catch (InterruptedException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+
 		try {
 			PreparedStatement stmtSelectUser = this.connection.prepareStatement("SELECT UserID, Username FROM users WHERE Username=? LIMIT 1");
 			stmtSelectUser.setString(1, unload.getUser().getUsername());
@@ -96,10 +108,19 @@ public class UnloadDBA {
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
+		} finally {
+			this.lock.unlock();
 		}
 	}
 
 	public List<Unload> getUnloads(String username) {
+		try {
+			this.lock.lock();
+		} catch (InterruptedException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+
 		try {
 			List<Unload> unloads = new ArrayList<Unload>();
 
@@ -146,11 +167,20 @@ public class UnloadDBA {
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
+		} finally {
+			this.lock.unlock();
 		}
 		return null;
 	}
 
 	public void deleteUnloads(String username) {
+		try {
+			this.lock.lock();
+		} catch (InterruptedException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+
 		try {
 			PreparedStatement statement = this.connection.prepareStatement("DELETE FROM unloads WHERE UserID=(SELECT UserID FROM users WHERE Username=?)");
 			statement.setString(1, username);
@@ -158,10 +188,19 @@ public class UnloadDBA {
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
+		} finally {
+			this.lock.unlock();
 		}
 	}
 
 	public void deleteUnload(Unload unload) {
+		try {
+			this.lock.lock();
+		} catch (InterruptedException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+
 		try {
 			PreparedStatement statement = this.connection.prepareStatement("DELETE FROM unloads WHERE UserID=(SELECT UserID FROM users WHERE Username=?) AND Date=?");
 			statement.setString(1, unload.getUser().getUsername());
@@ -170,10 +209,19 @@ public class UnloadDBA {
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
+		} finally {
+			this.lock.unlock();
 		}
 	}
 
 	private int getLatestUserID() {
+		try {
+			this.lock.lock();
+		} catch (InterruptedException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+
 		try {
 			Statement statement = this.connection.createStatement();
 			ResultSet rs = statement.executeQuery("SELECT UserID FROM users ORDER BY UserID DESC LIMIT 1");
@@ -184,11 +232,20 @@ public class UnloadDBA {
 		} catch (SQLException e) {
 			// Swallow exception
 			e.printStackTrace();
+		} finally {
+			this.lock.unlock();
 		}
 		return 1;
 	}
 
 	private int getLatestUnloadID() {
+		try {
+			this.lock.lock();
+		} catch (InterruptedException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+
 		try {
 			Statement statement = this.connection.createStatement();
 			ResultSet rs = statement.executeQuery("SELECT UnloadID FROM unloads ORDER BY UnloadID DESC LIMIT 1");
@@ -199,6 +256,8 @@ public class UnloadDBA {
 		} catch (SQLException e) {
 			// Swallow exception
 			e.printStackTrace();
+		} finally {
+			this.lock.unlock();
 		}
 		return 1;
 	}

@@ -5,7 +5,7 @@ import java.util.List;
 
 import org.joda.time.DateTime;
 
-import com.wiredlife.jsonformatjava.dba.unload.UnloadDBA;
+import com.wiredlife.jsonformatjava.dba.DBA;
 import com.wiredlife.jsonformatjava.model.unload.Unload;
 import com.wiredlife.jsonformatjava.model.unload.User;
 import com.wiredlife.jsonformatjava.model.unload.Zone;
@@ -97,7 +97,7 @@ public class Test {
 			System.out.println("time1 is older than time2; expected outcome!");
 		}
 
-		UnloadDBA dba = new UnloadDBA("database.sqlite");
+		DBA dba = new DBA("database.sqlite");
 		dba.addUnload(unload);
 
 		System.out.println(dba.getUnloads("bejbejpomp"));
