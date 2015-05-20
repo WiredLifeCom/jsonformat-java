@@ -59,55 +59,55 @@ public class DBA {
 	public void addUnload(Unload unload) {
 		try {
 			this.lock.lock();
+			
+			try {
+				PreparedStatement stmtSelectUser = this.connection.prepareStatement("SELECT UserID, Username FROM users WHERE Username=? LIMIT 1");
+				stmtSelectUser.setString(1, unload.getUser().getUsername());
+				ResultSet rsSelectUser = stmtSelectUser.executeQuery();
+
+				if (!rsSelectUser.next()) {
+					PreparedStatement stmtInsertUser = this.connection.prepareStatement("INSERT INTO users (Username) VALUES (?)");
+					stmtInsertUser.setString(1, unload.getUser().getUsername());
+					stmtInsertUser.executeUpdate();
+				}
+
+				int latestUserID = getLatestUserID();
+
+				PreparedStatement stmtInsertUnload = this.connection.prepareStatement("INSERT INTO unloads (UserID, Date) VALUES (?, ?)");
+				stmtInsertUnload.setInt(1, latestUserID);
+				stmtInsertUnload.setString(2, unload.getUnload().toString());
+				stmtInsertUnload.executeUpdate();
+
+				int latestUnloadID = getLatestUnloadID();
+
+				PreparedStatement stmtInsertUnloadsZones = this.connection
+						.prepareStatement("INSERT INTO unloadszones (UnloadID, Latitude, Longitude, Radius, Material, Arrival, Departure) VALUES (?, ?, ?, ?, ?, ?, ?)");
+
+				for (Zone zone : unload.getZones()) {
+					stmtInsertUnloadsZones.setInt(1, latestUnloadID);
+					stmtInsertUnloadsZones.setDouble(2, zone.getLatitude());
+					stmtInsertUnloadsZones.setDouble(3, zone.getLongitude());
+					stmtInsertUnloadsZones.setInt(4, zone.getRadius());
+					stmtInsertUnloadsZones.setString(5, zone.getMaterial());
+					stmtInsertUnloadsZones.setString(6, zone.getArrival().toString());
+					stmtInsertUnloadsZones.setString(7, zone.getDeparture().toString());
+					stmtInsertUnloadsZones.executeUpdate();
+				}
+
+				PreparedStatement stmtInsertUnloadsMaterials = this.connection.prepareStatement("INSERT INTO unloadsmaterials (UnloadID, Material) VALUES (?, ?)");
+
+				for (String material : unload.getMaterials()) {
+					stmtInsertUnloadsMaterials.setInt(1, latestUnloadID);
+					stmtInsertUnloadsMaterials.setString(2, material);
+					stmtInsertUnloadsMaterials.executeUpdate();
+				}
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		} catch (InterruptedException e1) {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
-		}
-
-		try {
-			PreparedStatement stmtSelectUser = this.connection.prepareStatement("SELECT UserID, Username FROM users WHERE Username=? LIMIT 1");
-			stmtSelectUser.setString(1, unload.getUser().getUsername());
-			ResultSet rsSelectUser = stmtSelectUser.executeQuery();
-
-			if (!rsSelectUser.next()) {
-				PreparedStatement stmtInsertUser = this.connection.prepareStatement("INSERT INTO users (Username) VALUES (?)");
-				stmtInsertUser.setString(1, unload.getUser().getUsername());
-				stmtInsertUser.executeUpdate();
-			}
-
-			int latestUserID = getLatestUserID();
-
-			PreparedStatement stmtInsertUnload = this.connection.prepareStatement("INSERT INTO unloads (UserID, Date) VALUES (?, ?)");
-			stmtInsertUnload.setInt(1, latestUserID);
-			stmtInsertUnload.setString(2, unload.getUnload().toString());
-			stmtInsertUnload.executeUpdate();
-
-			int latestUnloadID = getLatestUnloadID();
-
-			PreparedStatement stmtInsertUnloadsZones = this.connection
-					.prepareStatement("INSERT INTO unloadszones (UnloadID, Latitude, Longitude, Radius, Material, Arrival, Departure) VALUES (?, ?, ?, ?, ?, ?, ?)");
-
-			for (Zone zone : unload.getZones()) {
-				stmtInsertUnloadsZones.setInt(1, latestUnloadID);
-				stmtInsertUnloadsZones.setDouble(2, zone.getLatitude());
-				stmtInsertUnloadsZones.setDouble(3, zone.getLongitude());
-				stmtInsertUnloadsZones.setInt(4, zone.getRadius());
-				stmtInsertUnloadsZones.setString(5, zone.getMaterial());
-				stmtInsertUnloadsZones.setString(6, zone.getArrival().toString());
-				stmtInsertUnloadsZones.setString(7, zone.getDeparture().toString());
-				stmtInsertUnloadsZones.executeUpdate();
-			}
-
-			PreparedStatement stmtInsertUnloadsMaterials = this.connection.prepareStatement("INSERT INTO unloadsmaterials (UnloadID, Material) VALUES (?, ?)");
-
-			for (String material : unload.getMaterials()) {
-				stmtInsertUnloadsMaterials.setInt(1, latestUnloadID);
-				stmtInsertUnloadsMaterials.setString(2, material);
-				stmtInsertUnloadsMaterials.executeUpdate();
-			}
-		} catch (SQLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
 		} finally {
 			this.lock.unlock();
 		}
@@ -176,18 +176,18 @@ public class DBA {
 	public void deleteUnloads(String username) {
 		try {
 			this.lock.lock();
+			
+			try {
+				PreparedStatement statement = this.connection.prepareStatement("DELETE FROM unloads WHERE UserID=(SELECT UserID FROM users WHERE Username=?)");
+				statement.setString(1, username);
+				statement.executeUpdate();
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} 
 		} catch (InterruptedException e1) {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
-		}
-
-		try {
-			PreparedStatement statement = this.connection.prepareStatement("DELETE FROM unloads WHERE UserID=(SELECT UserID FROM users WHERE Username=?)");
-			statement.setString(1, username);
-			statement.executeUpdate();
-		} catch (SQLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
 		} finally {
 			this.lock.unlock();
 		}
@@ -196,19 +196,19 @@ public class DBA {
 	public void deleteUnload(Unload unload) {
 		try {
 			this.lock.lock();
+			
+			try {
+				PreparedStatement statement = this.connection.prepareStatement("DELETE FROM unloads WHERE UserID=(SELECT UserID FROM users WHERE Username=?) AND Date=?");
+				statement.setString(1, unload.getUser().getUsername());
+				statement.setString(2, unload.getUnload().toString());
+				statement.executeUpdate();
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} 
 		} catch (InterruptedException e1) {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
-		}
-
-		try {
-			PreparedStatement statement = this.connection.prepareStatement("DELETE FROM unloads WHERE UserID=(SELECT UserID FROM users WHERE Username=?) AND Date=?");
-			statement.setString(1, unload.getUser().getUsername());
-			statement.setString(2, unload.getUnload().toString());
-			statement.executeUpdate();
-		} catch (SQLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
 		} finally {
 			this.lock.unlock();
 		}
@@ -217,21 +217,21 @@ public class DBA {
 	private int getLatestUserID() {
 		try {
 			this.lock.lock();
+			
+			try {
+				Statement statement = this.connection.createStatement();
+				ResultSet rs = statement.executeQuery("SELECT UserID FROM users ORDER BY UserID DESC LIMIT 1");
+				while (rs.next()) {
+					return rs.getInt("UserID");
+				}
+				return 1;
+			} catch (SQLException e) {
+				// Swallow exception
+				e.printStackTrace();
+			} 
 		} catch (InterruptedException e1) {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
-		}
-
-		try {
-			Statement statement = this.connection.createStatement();
-			ResultSet rs = statement.executeQuery("SELECT UserID FROM users ORDER BY UserID DESC LIMIT 1");
-			while (rs.next()) {
-				return rs.getInt("UserID");
-			}
-			return 1;
-		} catch (SQLException e) {
-			// Swallow exception
-			e.printStackTrace();
 		} finally {
 			this.lock.unlock();
 		}
@@ -241,21 +241,21 @@ public class DBA {
 	private int getLatestUnloadID() {
 		try {
 			this.lock.lock();
+			
+			try {
+				Statement statement = this.connection.createStatement();
+				ResultSet rs = statement.executeQuery("SELECT UnloadID FROM unloads ORDER BY UnloadID DESC LIMIT 1");
+				while (rs.next()) {
+					return rs.getInt("UnloadID");
+				}
+				return 1;
+			} catch (SQLException e) {
+				// Swallow exception
+				e.printStackTrace();
+			} 
 		} catch (InterruptedException e1) {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
-		}
-
-		try {
-			Statement statement = this.connection.createStatement();
-			ResultSet rs = statement.executeQuery("SELECT UnloadID FROM unloads ORDER BY UnloadID DESC LIMIT 1");
-			while (rs.next()) {
-				return rs.getInt("UnloadID");
-			}
-			return 1;
-		} catch (SQLException e) {
-			// Swallow exception
-			e.printStackTrace();
 		} finally {
 			this.lock.unlock();
 		}
