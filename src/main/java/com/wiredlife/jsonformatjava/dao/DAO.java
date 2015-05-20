@@ -11,7 +11,6 @@ import java.util.List;
 
 import org.joda.time.DateTime;
 
-import com.mchange.v2.c3p0.ComboPooledDataSource;
 import com.wiredlife.jsonformatjava.model.status.OnlineStatus;
 import com.wiredlife.jsonformatjava.model.unload.Unload;
 import com.wiredlife.jsonformatjava.model.unload.User;
@@ -21,26 +20,18 @@ import com.wiredlife.jsonformatjava.utility.OSValidator.OS;
 
 public class DAO {
 
-	private static ComboPooledDataSource pool;
+	private DataSource dataSource;
 
 	private DAO() {
-		if (pool == null) {
-			this.pool = new ComboPooledDataSource();
-
-			DAO.pool.setInitialPoolSize(5);
-			this.pool.setAcquireIncrement(1);
-			this.pool.setMaxPoolSize(50);
-			this.pool.setMinPoolSize(5);
-			this.pool.setMaxStatements(10);
-		}
+		this.dataSource = DataSource.getInstance();
 
 		try {
 			if (OSValidator.getOS().equals(OS.ANDROID)) {
-				this.pool.setDriverClass("org.sqldroid.SQLDroidDriver");
+				this.dataSource.setDriverClass("org.sqldroid.SQLDroidDriver");
 				// DriverManager.registerDriver(new
 				// org.sqldroid.SQLDroidDriver());
 			} else {
-				this.pool.setDriverClass("org.sqlite.JDBC");
+				this.dataSource.setDriverClass("org.sqlite.JDBC");
 				// DriverManager.registerDriver(new org.sqlite.JDBC());
 			}
 		} catch (PropertyVetoException e) {
@@ -51,9 +42,9 @@ public class DAO {
 	public DAO(String database) {
 		this();
 
-		this.pool.setJdbcUrl(String.format("jdbc:sqlite:%s", database));
+		this.dataSource.setJdbcUrl(String.format("jdbc:sqlite:%s", database));
 
-		try (Connection connection = this.pool.getConnection()) {
+		try (Connection connection = this.dataSource.getConnection()) {
 			Statement statement = connection.createStatement();
 			statement.executeUpdate("PRAGMA foreign_keys=ON");
 			statement.executeUpdate("CREATE TABLE IF NOT EXISTS users (UserID integer, Username string unique, primary key (UserID))");
@@ -70,7 +61,7 @@ public class DAO {
 	}
 
 	public void addOnlineStatus(OnlineStatus onlineStatus) {
-		try (Connection connection = this.pool.getConnection()) {
+		try (Connection connection = this.dataSource.getConnection()) {
 			PreparedStatement stmtSelectUser = connection.prepareStatement("SELECT UserID, Username FROM users WHERE Username=? LIMIT 1");
 			stmtSelectUser.setString(1, onlineStatus.getUsername());
 			ResultSet rsSelectUser = stmtSelectUser.executeQuery();
@@ -94,7 +85,7 @@ public class DAO {
 	}
 
 	public void addUnload(Unload unload) {
-		try (Connection connection = this.pool.getConnection()) {
+		try (Connection connection = this.dataSource.getConnection()) {
 			PreparedStatement stmtSelectUser = connection.prepareStatement("SELECT UserID, Username FROM users WHERE Username=? LIMIT 1");
 			stmtSelectUser.setString(1, unload.getUser().getUsername());
 			ResultSet rsSelectUser = stmtSelectUser.executeQuery();
@@ -141,7 +132,7 @@ public class DAO {
 	}
 
 	public List<Unload> getUnloads(String username) {
-		try (Connection connection = this.pool.getConnection()) {
+		try (Connection connection = this.dataSource.getConnection()) {
 			PreparedStatement stmtGetUnloadIds = connection.prepareStatement("SELECT UnloadID, Date FROM unloads INNER JOIN users ON unloads.UserID = users.UserID WHERE Username=?");
 			stmtGetUnloadIds.setString(1, username);
 			ResultSet rsGetUnloadIds = stmtGetUnloadIds.executeQuery();
@@ -192,7 +183,7 @@ public class DAO {
 	}
 
 	public void deleteUnloads(String username) {
-		try (Connection connection = this.pool.getConnection()) {
+		try (Connection connection = this.dataSource.getConnection()) {
 			PreparedStatement statement = connection.prepareStatement("DELETE FROM unloads WHERE UserID=(SELECT UserID FROM users WHERE Username=?)");
 			statement.setString(1, username);
 			statement.executeUpdate();
@@ -203,7 +194,7 @@ public class DAO {
 	}
 
 	public void deleteUnload(Unload unload) {
-		try (Connection connection = this.pool.getConnection()) {
+		try (Connection connection = this.dataSource.getConnection()) {
 			PreparedStatement statement = connection.prepareStatement("DELETE FROM unloads WHERE UserID=(SELECT UserID FROM users WHERE Username=?) AND Date=?");
 			statement.setString(1, unload.getUser().getUsername());
 			statement.setString(2, unload.getUnload().toString());
@@ -215,7 +206,7 @@ public class DAO {
 	}
 
 	private int getLatestUserID() {
-		try (Connection connection = this.pool.getConnection()) {
+		try (Connection connection = this.dataSource.getConnection()) {
 			Statement statement = connection.createStatement();
 			ResultSet rs = statement.executeQuery("SELECT UserID FROM users ORDER BY UserID DESC LIMIT 1");
 			while (rs.next()) {
@@ -230,7 +221,7 @@ public class DAO {
 	}
 
 	private int getLatestUnloadID() {
-		try (Connection connection = this.pool.getConnection()) {
+		try (Connection connection = this.dataSource.getConnection()) {
 			Statement statement = connection.createStatement();
 			ResultSet rs = statement.executeQuery("SELECT UnloadID FROM unloads ORDER BY UnloadID DESC LIMIT 1");
 			while (rs.next()) {
