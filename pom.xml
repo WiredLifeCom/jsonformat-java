@@ -60,49 +60,49 @@
 				<version>2.3</version>
 				<executions>
 				
-				<execution>
-					<id>desktop</id>
-					<phase>package</phase>
-					<goals>
-						<goal>shade</goal>
-					</goals>
-					<configuration>
-						<finalName>${project.artifactId}-${project.version}-desktop</finalName>
-						<artifactSet>
-							<excludes>
-								<exclude>org.sqldroid:sqldroid</exclude>
-							</excludes>
-						</artifactSet>
-					</configuration>
-				</execution>
+					<execution>
+						<id>desktop</id>
+						<phase>package</phase>
+						<goals>
+							<goal>shade</goal>
+						</goals>
+						<configuration>
+							<finalName>${project.artifactId}-${project.version}-desktop</finalName>
+							<artifactSet>
+								<excludes>
+									<exclude>org.sqldroid:sqldroid</exclude>
+								</excludes>
+							</artifactSet>
+						</configuration>
+					</execution>
 					
-				<execution>
-					<id>android</id>
-					<phase>package</phase>
-					<goals>
-						<goal>shade</goal>
-					</goals>
-					<configuration>
-						<finalName>${project.artifactId}-${project.version}-android</finalName>
-						<artifactSet>
-							<excludes>
-								<exclude>org.xerial:sqlite-jdbc</exclude>
-							</excludes>
-						</artifactSet>
-					</configuration>
-				</execution>
+					<execution>
+						<id>android</id>
+						<phase>package</phase>
+						<goals>
+							<goal>shade</goal>
+						</goals>
+						<configuration>
+							<finalName>${project.artifactId}-${project.version}-android</finalName>
+							<artifactSet>
+								<excludes>
+									<exclude>org.xerial:sqlite-jdbc</exclude>
+								</excludes>
+							</artifactSet>
+						</configuration>
+					</execution>
 					
-			</executions>
-		</plugin>
+				</executions>
+			</plugin>
 		
-		<plugin>
-			<artifactId>maven-compiler-plugin</artifactId>
-			<version>3.2</version>
-			<configuration>
-				<source>1.7</source>
-				<target>1.7</target>
-			</configuration>
-   		</plugin>
+			<plugin>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<version>3.2</version>
+				<configuration>
+					<source>1.7</source>
+					<target>1.7</target>
+				</configuration>
+	   		</plugin>
       		
       	</plugins>
 	</build>
