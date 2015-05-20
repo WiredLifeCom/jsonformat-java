@@ -1,4 +1,4 @@
-package com.wiredlife.jsonformatjava.status;
+package com.wiredlife.jsonformatjava.model.status;
 
 import com.google.gson.Gson;
 

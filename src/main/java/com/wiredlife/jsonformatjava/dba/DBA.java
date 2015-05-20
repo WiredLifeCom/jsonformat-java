@@ -11,10 +11,10 @@ import java.util.List;
 
 import org.joda.time.DateTime;
 
+import com.wiredlife.jsonformatjava.model.status.OnlineStatus;
 import com.wiredlife.jsonformatjava.model.unload.Unload;
 import com.wiredlife.jsonformatjava.model.unload.User;
 import com.wiredlife.jsonformatjava.model.unload.Zone;
-import com.wiredlife.jsonformatjava.status.OnlineStatus;
 import com.wiredlife.jsonformatjava.utility.Lock;
 import com.wiredlife.jsonformatjava.utility.OSValidator;
 import com.wiredlife.jsonformatjava.utility.OSValidator.OS;
