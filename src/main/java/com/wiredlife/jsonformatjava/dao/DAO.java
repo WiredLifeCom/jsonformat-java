@@ -22,24 +22,20 @@ public class DAO {
 
 	private DataSource dataSource;
 
-	private DAO() {
+	private DAO() throws PropertyVetoException {
 		this.dataSource = DataSource.getInstance();
 
-		try {
-			if (OSValidator.getOS().equals(OS.ANDROID)) {
-				this.dataSource.setDriverClass("org.sqldroid.SQLDroidDriver");
-				// DriverManager.registerDriver(new
-				// org.sqldroid.SQLDroidDriver());
-			} else {
-				this.dataSource.setDriverClass("org.sqlite.JDBC");
-				// DriverManager.registerDriver(new org.sqlite.JDBC());
-			}
-		} catch (PropertyVetoException e) {
-			e.printStackTrace();
+		if (OSValidator.getOS().equals(OS.ANDROID)) {
+			this.dataSource.setDriverClass("org.sqldroid.SQLDroidDriver");
+			// DriverManager.registerDriver(new
+			// org.sqldroid.SQLDroidDriver());
+		} else {
+			this.dataSource.setDriverClass("org.sqlite.JDBC");
+			// DriverManager.registerDriver(new org.sqlite.JDBC());
 		}
 	}
 
-	public DAO(String database) {
+	public DAO(String database) throws PropertyVetoException, SQLException {
 		this();
 
 		this.dataSource.setJdbcUrl(String.format("jdbc:sqlite:%s", database));
@@ -55,12 +51,10 @@ public class DAO {
 					.executeUpdate("CREATE TABLE IF NOT EXISTS unloadsmaterials (UnloadID integer, Material string, foreign key (UnloadID) references unloads(UnloadID) ON UPDATE CASCADE ON DELETE CASCADE)");
 			statement
 					.executeUpdate("CREATE TABLE IF NOT EXISTS onlinestatuses (UserID integer, IsHome integer, IpAddress string, foreign key (UserID) references users(UserID) ON UPDATE CASCADE ON DELETE CASCADE)");
-		} catch (SQLException e) {
-			e.printStackTrace();
 		}
 	}
 
-	public void addOnlineStatus(OnlineStatus onlineStatus) {
+	public void addOnlineStatus(OnlineStatus onlineStatus) throws SQLException {
 		try (Connection connection = this.dataSource.getConnection()) {
 			PreparedStatement stmtSelectUser = connection.prepareStatement("SELECT UserID, Username FROM users WHERE Username=? LIMIT 1");
 			stmtSelectUser.setString(1, onlineStatus.getUsername());
@@ -79,12 +73,10 @@ public class DAO {
 			stmtInsertOnlineStatus.setBoolean(2, onlineStatus.isHome());
 			stmtInsertOnlineStatus.setString(3, onlineStatus.getIpAddress());
 			stmtInsertOnlineStatus.executeUpdate();
-		} catch (SQLException e1) {
-			e1.printStackTrace();
 		}
 	}
 
-	public void addUnload(Unload unload) {
+	public void addUnload(Unload unload) throws SQLException {
 		try (Connection connection = this.dataSource.getConnection()) {
 			PreparedStatement stmtSelectUser = connection.prepareStatement("SELECT UserID, Username FROM users WHERE Username=? LIMIT 1");
 			stmtSelectUser.setString(1, unload.getUser().getUsername());
@@ -125,13 +117,10 @@ public class DAO {
 				stmtInsertUnloadsMaterials.setString(2, material);
 				stmtInsertUnloadsMaterials.executeUpdate();
 			}
-		} catch (SQLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
 		}
 	}
 
-	public List<Unload> getUnloads(String username) {
+	public List<Unload> getUnloads(String username) throws SQLException {
 		try (Connection connection = this.dataSource.getConnection()) {
 			PreparedStatement stmtGetUnloadIds = connection.prepareStatement("SELECT UnloadID, Date FROM unloads INNER JOIN users ON unloads.UserID = users.UserID WHERE Username=?");
 			stmtGetUnloadIds.setString(1, username);
@@ -175,37 +164,27 @@ public class DAO {
 				unloads.add(unload);
 			}
 			return unloads;
-		} catch (SQLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
 		}
-		return null;
 	}
 
-	public void deleteUnloads(String username) {
+	public void deleteUnloads(String username) throws SQLException {
 		try (Connection connection = this.dataSource.getConnection()) {
 			PreparedStatement statement = connection.prepareStatement("DELETE FROM unloads WHERE UserID=(SELECT UserID FROM users WHERE Username=?)");
 			statement.setString(1, username);
 			statement.executeUpdate();
-		} catch (SQLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
 		}
 	}
 
-	public void deleteUnload(Unload unload) {
+	public void deleteUnload(Unload unload) throws SQLException {
 		try (Connection connection = this.dataSource.getConnection()) {
 			PreparedStatement statement = connection.prepareStatement("DELETE FROM unloads WHERE UserID=(SELECT UserID FROM users WHERE Username=?) AND Date=?");
 			statement.setString(1, unload.getUser().getUsername());
 			statement.setString(2, unload.getUnload().toString());
 			statement.executeUpdate();
-		} catch (SQLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
 		}
 	}
 
-	private int getLatestUserID() {
+	private int getLatestUserID() throws SQLException {
 		try (Connection connection = this.dataSource.getConnection()) {
 			Statement statement = connection.createStatement();
 			ResultSet rs = statement.executeQuery("SELECT UserID FROM users ORDER BY UserID DESC LIMIT 1");
@@ -213,14 +192,10 @@ public class DAO {
 				return rs.getInt("UserID");
 			}
 			return 1;
-		} catch (SQLException e) {
-			// Swallow exception
-			e.printStackTrace();
 		}
-		return 1;
 	}
 
-	private int getLatestUnloadID() {
+	private int getLatestUnloadID() throws SQLException {
 		try (Connection connection = this.dataSource.getConnection()) {
 			Statement statement = connection.createStatement();
 			ResultSet rs = statement.executeQuery("SELECT UnloadID FROM unloads ORDER BY UnloadID DESC LIMIT 1");
@@ -228,11 +203,7 @@ public class DAO {
 				return rs.getInt("UnloadID");
 			}
 			return 1;
-		} catch (SQLException e) {
-			// Swallow exception
-			e.printStackTrace();
 		}
-		return 1;
 	}
 
 }
