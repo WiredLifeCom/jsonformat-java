@@ -66,10 +66,10 @@ public class DAO {
 				stmtInsertUser.executeUpdate();
 			}
 
-			int latestUserID = getLatestUserID();
+			int userID = getUserID(onlineStatus.getUsername());
 
 			PreparedStatement stmtInsertOnlineStatus = connection.prepareStatement("INSERT INTO onlinestatuses (UserID, IsHome, IpAddress) VALUES (?, ?, ?)");
-			stmtInsertOnlineStatus.setInt(1, latestUserID);
+			stmtInsertOnlineStatus.setInt(1, userID);
 			stmtInsertOnlineStatus.setBoolean(2, onlineStatus.isHome());
 			stmtInsertOnlineStatus.setString(3, onlineStatus.getIpAddress());
 			stmtInsertOnlineStatus.executeUpdate();
@@ -88,20 +88,20 @@ public class DAO {
 				stmtInsertUser.executeUpdate();
 			}
 
-			int latestUserID = getLatestUserID();
+			int userID = getUserID(unload.getUser().getUsername());
 
 			PreparedStatement stmtInsertUnload = connection.prepareStatement("INSERT INTO unloads (UserID, Date) VALUES (?, ?)");
-			stmtInsertUnload.setInt(1, latestUserID);
+			stmtInsertUnload.setInt(1, userID);
 			stmtInsertUnload.setString(2, unload.getUnload().toString());
 			stmtInsertUnload.executeUpdate();
 
-			int latestUnloadID = getLatestUnloadID();
+			int unloadID = getUnloadID(userID, unload.getUnload());
 
 			PreparedStatement stmtInsertUnloadsZones = connection
 					.prepareStatement("INSERT INTO unloadszones (UnloadID, Latitude, Longitude, Radius, Material, Arrival, Departure) VALUES (?, ?, ?, ?, ?, ?, ?)");
 
 			for (Zone zone : unload.getZones()) {
-				stmtInsertUnloadsZones.setInt(1, latestUnloadID);
+				stmtInsertUnloadsZones.setInt(1, unloadID);
 				stmtInsertUnloadsZones.setDouble(2, zone.getLatitude());
 				stmtInsertUnloadsZones.setDouble(3, zone.getLongitude());
 				stmtInsertUnloadsZones.setInt(4, zone.getRadius());
@@ -113,7 +113,7 @@ public class DAO {
 
 			PreparedStatement stmtInsertUnloadsMaterials = connection.prepareStatement("INSERT INTO unloadsmaterials (UnloadID, Material) VALUES (?, ?)");
 			for (String material : unload.getMaterials()) {
-				stmtInsertUnloadsMaterials.setInt(1, latestUnloadID);
+				stmtInsertUnloadsMaterials.setInt(1, unloadID);
 				stmtInsertUnloadsMaterials.setString(2, material);
 				stmtInsertUnloadsMaterials.executeUpdate();
 			}
@@ -184,25 +184,28 @@ public class DAO {
 		}
 	}
 
-	private int getLatestUserID() throws SQLException {
+	private int getUserID(String username) throws SQLException {
 		try (Connection connection = this.dataSource.getConnection()) {
-			Statement statement = connection.createStatement();
-			ResultSet rs = statement.executeQuery("SELECT UserID FROM users ORDER BY UserID DESC LIMIT 1");
+			PreparedStatement statement = connection.prepareStatement("SELECT UserID FROM users WHERE Username=? ORDER BY UserID DESC LIMIT 1");
+			statement.setString(1, username);
+			ResultSet rs = statement.executeQuery();
 			while (rs.next()) {
 				return rs.getInt("UserID");
 			}
-			return 1;
+			throw new SQLException("A user by that name doesn't exist");
 		}
 	}
 
-	private int getLatestUnloadID() throws SQLException {
+	private int getUnloadID(int userID, DateTime dateTime) throws SQLException {
 		try (Connection connection = this.dataSource.getConnection()) {
-			Statement statement = connection.createStatement();
-			ResultSet rs = statement.executeQuery("SELECT UnloadID FROM unloads ORDER BY UnloadID DESC LIMIT 1");
+			PreparedStatement statement = connection.prepareStatement("SELECT UnloadID FROM unloads WHERE UserID=? AND Date=? ORDER BY UserID DESC LIMIT 1");
+			statement.setInt(1, userID);
+			statement.setString(2, dateTime.toString());
+			ResultSet rs = statement.executeQuery();
 			while (rs.next()) {
 				return rs.getInt("UnloadID");
 			}
-			return 1;
+			throw new SQLException("A unload with that user id and date doesn't exist");
 		}
 	}
 
