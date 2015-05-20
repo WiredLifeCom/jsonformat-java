@@ -14,6 +14,7 @@ import org.joda.time.DateTime;
 import com.wiredlife.jsonformatjava.model.unload.Unload;
 import com.wiredlife.jsonformatjava.model.unload.User;
 import com.wiredlife.jsonformatjava.model.unload.Zone;
+import com.wiredlife.jsonformatjava.status.OnlineStatus;
 import com.wiredlife.jsonformatjava.utility.Lock;
 import com.wiredlife.jsonformatjava.utility.OSValidator;
 import com.wiredlife.jsonformatjava.utility.OSValidator.OS;
@@ -51,8 +52,41 @@ public class DBA {
 					.executeUpdate("CREATE TABLE IF NOT EXISTS unloadszones (UnloadID integer, Latitude double, Longitude double, Radius integer, Material string, Arrival date, Departure date, foreign key (UnloadID) references unloads(UnloadID) ON UPDATE CASCADE ON DELETE CASCADE)");
 			statement
 					.executeUpdate("CREATE TABLE IF NOT EXISTS unloadsmaterials (UnloadID integer, Material string, foreign key (UnloadID) references unloads(UnloadID) ON UPDATE CASCADE ON DELETE CASCADE)");
+			statement.executeUpdate("CREATE TABLE IF NOT EXISTS onlinestatuses (UserID integer, IsHome boolean, IpAddress string) foreign key (UserID) references users(UserID) ON UPDATE CASCADE ON DELETE CASCADE)");
 		} catch (SQLException e) {
 			e.printStackTrace();
+		}
+	}
+	
+	public void addOnlineStatus(OnlineStatus onlineStatus) {
+		try {
+			this.lock.lock();
+			
+			try {
+				PreparedStatement stmtSelectUser = this.connection.prepareStatement("SELECT UserID, Username FROM users WHERE Username=? LIMIT 1");
+				stmtSelectUser.setString(1, onlineStatus.getUsername());
+				ResultSet rsSelectUser = stmtSelectUser.executeQuery();
+				
+				if (!rsSelectUser.next()) {
+					PreparedStatement stmtInsertUser = this.connection.prepareStatement("INSERT INTO users (Username) VALUES (?)");
+					stmtInsertUser.setString(1, onlineStatus.getUsername());
+					stmtInsertUser.executeUpdate();
+				}
+				
+				int latestUserID = getLatestUserID();
+				
+				PreparedStatement stmtInsertOnlineStatus = this.connection.prepareStatement("INSERT INTO onlinestatuses (UserID, IsHome, IpAddress) VALUES (?, ?, ?)");
+				stmtInsertOnlineStatus.setInt(1, latestUserID);
+				stmtInsertOnlineStatus.setBoolean(2, onlineStatus.isHome());
+				stmtInsertOnlineStatus.setString(3, onlineStatus.getIpAddress());
+				stmtInsertOnlineStatus.executeUpdate();
+			} catch (SQLException e1) {
+				e1.printStackTrace();
+			}
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		} finally {
+			this.lock.unlock();
 		}
 	}
 
@@ -95,7 +129,6 @@ public class DBA {
 				}
 
 				PreparedStatement stmtInsertUnloadsMaterials = this.connection.prepareStatement("INSERT INTO unloadsmaterials (UnloadID, Material) VALUES (?, ?)");
-
 				for (String material : unload.getMaterials()) {
 					stmtInsertUnloadsMaterials.setInt(1, latestUnloadID);
 					stmtInsertUnloadsMaterials.setString(2, material);
@@ -252,7 +285,7 @@ public class DBA {
 			} catch (SQLException e) {
 				// Swallow exception
 				e.printStackTrace();
-			} 
+			}
 		} catch (InterruptedException e1) {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
