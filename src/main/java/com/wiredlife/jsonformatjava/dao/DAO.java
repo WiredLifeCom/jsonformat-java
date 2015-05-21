@@ -69,11 +69,44 @@ public class DAO {
 
 			int userID = getUserID(onlineStatus.getUsername());
 
-			try (PreparedStatement stmtInsertOnlineStatus = connection.prepareStatement("INSERT INTO onlinestatuses (UserID, IsHome, IpAddress) VALUES (?, ?, ?)")) {
-				stmtInsertOnlineStatus.setInt(1, userID);
-				stmtInsertOnlineStatus.setBoolean(2, onlineStatus.isHome());
-				stmtInsertOnlineStatus.setString(3, onlineStatus.getIpAddress());
-				stmtInsertOnlineStatus.executeUpdate();
+			try (PreparedStatement stmtSelectOnlineStatus = connection.prepareStatement("SELECT UserID FROM onlinestatuses WHERE UserID=?")) {
+				stmtSelectOnlineStatus.setInt(1, userID);
+				ResultSet rsSelectOnlineStatus = stmtSelectOnlineStatus.executeQuery();
+
+				if (!rsSelectOnlineStatus.next()) {
+					try (PreparedStatement stmtInsertOnlineStatus = connection.prepareStatement("INSERT INTO onlinestatuses (UserID, IsHome, IpAddress) VALUES (?, ?, ?)")) {
+						stmtInsertOnlineStatus.setInt(1, userID);
+						stmtInsertOnlineStatus.setBoolean(2, onlineStatus.isHome());
+						stmtInsertOnlineStatus.setString(3, onlineStatus.getIpAddress());
+						stmtInsertOnlineStatus.executeUpdate();
+					}
+				} else {
+					try (PreparedStatement stmtUpdateOnlineStatus = connection.prepareStatement("UPDATE onlinestatuses SET IsHome=?, IpAddress=? WHERE UserID=?")) {
+						stmtUpdateOnlineStatus.setBoolean(1, onlineStatus.isHome());
+						stmtUpdateOnlineStatus.setString(2, onlineStatus.getIpAddress());
+						stmtUpdateOnlineStatus.setInt(1, userID);
+					}
+				}
+			}
+		}
+	}
+
+	public OnlineStatus getOnlineStatus(String username) throws SQLException {
+		try (Connection connection = this.dataSource.getConnection()) {
+			try (PreparedStatement stmtSelectOnlineStatus = connection
+					.prepareStatement("SELECT Username, IsHome, IpAddress FROM onlinestatuses INNER JOIN users ON onlinestatuses.UserID = users.UserID WHERE Username=?")) {
+				stmtSelectOnlineStatus.setString(1, username);
+				ResultSet rsSelectOnlineStatus = stmtSelectOnlineStatus.executeQuery();
+
+				if (rsSelectOnlineStatus.next()) {
+					OnlineStatus onlineStatus = new OnlineStatus();
+					onlineStatus.setUsername(rsSelectOnlineStatus.getString("Username"));
+					onlineStatus.setHome(rsSelectOnlineStatus.getBoolean("IsHome"));
+					onlineStatus.setIpAddress(rsSelectOnlineStatus.getString("IpAddress"));
+
+					return onlineStatus;
+				}
+				return null;
 			}
 		}
 	}
