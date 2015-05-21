@@ -59,7 +59,7 @@ public class Zone {
 	}
 
 	public int getNumberOfMaterialBlocks() {
-		return numberOfMaterialBlocks;
+		return this.numberOfMaterialBlocks;
 	}
 
 	public void setNumberOfMaterialBlocks(int numberOfMaterialBlocks) {
@@ -87,9 +87,9 @@ public class Zone {
 		final int prime = 31;
 		int result = 1;
 		long temp;
-		temp = Double.doubleToLongBits(latitude);
+		temp = Double.doubleToLongBits(this.latitude);
 		result = prime * result + (int) (temp ^ (temp >>> 32));
-		temp = Double.doubleToLongBits(longitude);
+		temp = Double.doubleToLongBits(this.longitude);
 		result = prime * result + (int) (temp ^ (temp >>> 32));
 		return result;
 	}
@@ -103,11 +103,9 @@ public class Zone {
 		if (getClass() != obj.getClass())
 			return false;
 		Zone other = (Zone) obj;
-		if (Double.doubleToLongBits(latitude) != Double
-				.doubleToLongBits(other.latitude))
+		if (Double.doubleToLongBits(this.latitude) != Double.doubleToLongBits(other.latitude))
 			return false;
-		if (Double.doubleToLongBits(longitude) != Double
-				.doubleToLongBits(other.longitude))
+		if (Double.doubleToLongBits(this.longitude) != Double.doubleToLongBits(other.longitude))
 			return false;
 		return true;
 	}
@@ -116,23 +114,21 @@ public class Zone {
 	public String toString() {
 		StringBuilder builder = new StringBuilder();
 		builder.append("Zone [latitude=");
-		builder.append(latitude);
+		builder.append(this.latitude);
 		builder.append(", longitude=");
-		builder.append(longitude);
+		builder.append(this.longitude);
 		builder.append(", radius=");
-		builder.append(radius);
+		builder.append(this.radius);
 		builder.append(", material=");
-		builder.append(material);
+		builder.append(this.material);
 		builder.append(", numberOfMaterialBlocks=");
-		builder.append(numberOfMaterialBlocks);
+		builder.append(this.numberOfMaterialBlocks);
 		builder.append(", arrival=");
-		builder.append(arrival);
+		builder.append(this.arrival);
 		builder.append(", departure=");
-		builder.append(departure);
+		builder.append(this.departure);
 		builder.append("]");
 		return builder.toString();
 	}
-	
-	
 
 }
