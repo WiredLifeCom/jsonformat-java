@@ -1,6 +1,7 @@
 package com.wiredlife.jsonformatjava.model.status;
 
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 
 public class OnlineStatus {
 
@@ -33,12 +34,12 @@ public class OnlineStatus {
 	}
 
 	public static String toJson(OnlineStatus onlineStatus) {
-		Gson gson = new Gson();
+		Gson gson = new GsonBuilder().setPrettyPrinting().create();
 		return gson.toJson(onlineStatus);
 	}
 
 	public static OnlineStatus fromJson(String json) {
-		Gson gson = new Gson();
+		Gson gson = new GsonBuilder().setPrettyPrinting().create();
 		return gson.fromJson(json, OnlineStatus.class);
 	}
 

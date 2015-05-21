@@ -149,12 +149,12 @@ public class Unload {
 	}
 
 	public static String toJson(Unload unload) {
-		Gson gson = Converters.registerDateTime(new GsonBuilder()).create();
+		Gson gson = Converters.registerDateTime(new GsonBuilder().setPrettyPrinting()).create();
 		return gson.toJson(unload);
 	}
 
 	public static Unload fromJson(String json) {
-		Gson gson = Converters.registerDateTime(new GsonBuilder()).create();
+		Gson gson = Converters.registerDateTime(new GsonBuilder().setPrettyPrinting()).create();
 		return gson.fromJson(json, Unload.class);
 	}
 
