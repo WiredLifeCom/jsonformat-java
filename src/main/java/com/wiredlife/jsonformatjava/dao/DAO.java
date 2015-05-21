@@ -85,6 +85,7 @@ public class DAO {
 						stmtUpdateOnlineStatus.setBoolean(1, onlineStatus.isHome());
 						stmtUpdateOnlineStatus.setString(2, onlineStatus.getIpAddress());
 						stmtUpdateOnlineStatus.setInt(1, userID);
+						stmtUpdateOnlineStatus.executeUpdate();
 					}
 				}
 			}
