@@ -43,6 +43,19 @@ public class OnlineStatus {
 		this.ipAddress = ipAddress;
 	}
 
+	@Override
+	public String toString() {
+		StringBuilder builder = new StringBuilder();
+		builder.append("OnlineStatus [username=");
+		builder.append(username);
+		builder.append(", isHome=");
+		builder.append(isHome);
+		builder.append(", ipAddress=");
+		builder.append(ipAddress);
+		builder.append("]");
+		return builder.toString();
+	}
+
 	public static String toJson(OnlineStatus onlineStatus) {
 		Gson gson = new GsonBuilder().setPrettyPrinting().create();
 		return gson.toJson(onlineStatus);
