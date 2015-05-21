@@ -78,6 +78,26 @@ public class UnloadUnitTest {
 	}
 	
 	@Test
+	public void toJson() {
+		Unload unload = new Unload();
+		
+		String json = Unload.toJson(unload);
+		
+		assertNotNull(json);
+	}
+	
+	@Test
+	public void fromJson() {
+		Unload unload = new Unload();
+		
+		String json = Unload.toJson(unload);
+		
+		Unload newUnload = Unload.fromJson(json);
+		
+		assertEquals(unload, newUnload);
+	}
+	
+	@Test
 	public void toStringTest() {
 		Unload unload = new Unload();
 		
