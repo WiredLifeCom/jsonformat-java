@@ -84,7 +84,7 @@ public class DAO {
 					try (PreparedStatement stmtUpdateOnlineStatus = connection.prepareStatement("UPDATE onlinestatuses SET IsHome=?, IpAddress=? WHERE UserID=?")) {
 						stmtUpdateOnlineStatus.setBoolean(1, onlineStatus.isHome());
 						stmtUpdateOnlineStatus.setString(2, onlineStatus.getIpAddress());
-						stmtUpdateOnlineStatus.setInt(1, userID);
+						stmtUpdateOnlineStatus.setInt(3, userID);
 						stmtUpdateOnlineStatus.executeUpdate();
 					}
 				}
