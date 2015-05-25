@@ -1,24 +1,28 @@
 package com.wiredlife.jsonformatjava.model.status;
 
+import java.io.Serializable;
+
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
-public class OnlineStatus {
+public class OnlineStatus implements Serializable {
+
+	private static final long serialVersionUID = 3045481429680287135L;
 
 	private String username;
 	private boolean isHome;
 	private String ipAddress;
 
 	public OnlineStatus() {
-		
+
 	}
-	
+
 	public OnlineStatus(String username, boolean isHome, String ipAddress) {
 		this.username = username;
 		this.isHome = isHome;
 		this.ipAddress = ipAddress;
 	}
-	
+
 	public String getUsername() {
 		return this.username;
 	}

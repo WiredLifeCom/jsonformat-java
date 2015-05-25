@@ -1,5 +1,6 @@
 package com.wiredlife.jsonformatjava.model.unload;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -9,7 +10,9 @@ import com.fatboyindustrial.gsonjodatime.Converters;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
-public class Unload {
+public class Unload implements Serializable {
+
+	private static final long serialVersionUID = 5250232465385702201L;
 
 	private User user;
 

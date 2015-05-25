@@ -1,6 +1,10 @@
 package com.wiredlife.jsonformatjava.model.unload;
 
-public class User {
+import java.io.Serializable;
+
+public class User implements Serializable {
+
+	private static final long serialVersionUID = 3055757833971516279L;
 
 	private String username;
 

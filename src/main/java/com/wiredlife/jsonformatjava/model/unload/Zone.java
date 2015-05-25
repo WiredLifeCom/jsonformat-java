@@ -1,8 +1,12 @@
 package com.wiredlife.jsonformatjava.model.unload;
 
+import java.io.Serializable;
+
 import org.joda.time.DateTime;
 
-public class Zone {
+public class Zone implements Serializable {
+
+	private static final long serialVersionUID = -101390129093050893L;
 
 	private double latitude;
 	private double longitude;
